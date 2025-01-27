@@ -1,8 +1,8 @@
 ## Output image files:
-.ppm
-.jpeg
-.png
-.jpg
+*.ppm
+*.jpeg
+*.png
+*.jpg
 
 
 # Prerequisites
