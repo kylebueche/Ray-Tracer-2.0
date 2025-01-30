@@ -1,10 +1,14 @@
 #ifndef HITTABLE_H
 #define HITTABLE_H
 
-class hit_record {
+class material;
+
+class hit_record
+{
   public:
 	point3 p;
 	vec3 normal;
+	shared_ptr<material> mat;
 	double t;
 	bool front_face;
 
