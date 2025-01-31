@@ -147,6 +147,17 @@ inline vec3 random_unit_vector()
 	}
 }
 
+inline vec3 random_in_unit_sphere()
+{
+	while (true)
+	{
+		auto p = vec3::random(-1, 1);
+		auto lensq = p.length_squared();
+		if (1e-160 < lensq && lensq <= 1)
+			return p;
+	}
+}
+
 inline vec3 random_on_hemisphere(const vec3& normal)
 {
 	vec3 on_unit_sphere = random_unit_vector();

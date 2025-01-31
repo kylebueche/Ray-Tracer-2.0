@@ -15,6 +15,11 @@
 #include "material.h"
 #include "sphere.h"
 
+#include <windows.h>
+
+void begin_csv(void);
+void write_to_csv(vec3, vec3, vec3, vec3);
+
 int main()
 {
 	hittable_list scene;
@@ -42,5 +47,31 @@ int main()
 	cam.lookat = point3(0, 0, -1);
 	cam.vup = vec3(0, 1, 0);
 
-	cam.render(scene);
+	//cam.render(scene);
+	int samps = 100000;
+	vec3 norm = vec3(0, 1, 0);
+
+	begin_csv();
+
+	for (int i = 0; i < samps; i++)
+	{
+		write_to_csv(random_on_hemisphere(norm) * vec3(1, 2, 1),
+					 norm + random_unit_vector(),
+					 norm + random_in_unit_sphere(),
+					 norm);
+	}
+
+}
+
+void begin_csv()
+{
+	std::cout << "On Hemisphere, , , , ,On Unit Sphere, , , , ,In Unit Sphere\n";
+	std::cout << "X Values,Y Values,Z Values,Cosine Values, ,X Values,Y Values,Z Values,Cosine Values, ,X Values,Y Values,Z Values,Cosine Values\n";
+}
+
+void write_to_csv(vec3 onhemi, vec3 onsphere, vec3 insphere, vec3 normal)
+{
+	std::cout << onhemi.e[0] << "," << onhemi.e[1] << "," << onhemi.e[2] << "," << dot(normal, unit_vector(onhemi)) << ", ,";
+	std::cout << onsphere.e[0] << "," << onsphere.e[1] << "," << onsphere.e[2] << "," << dot(normal, unit_vector(onsphere)) << ", ,";
+	std::cout << insphere.e[0] << "," << insphere.e[1] << "," << insphere.e[2] << "," << dot(normal, unit_vector(insphere)) << "\n";
 }

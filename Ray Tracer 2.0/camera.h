@@ -93,18 +93,17 @@ private:
 		defocus_disk_v = v * defocus_radius;
 	}
 
-	// Construct a camera ray originating from the oriin and directed
-	// at a randomly sampled point around the pixel location i, j
+
+	// Construct a camera ray originatinf from the defocus disk and directed at
+	// a randomly sampled point around the pixel location i, j
 	ray get_ray(int i, int j) const
 	{
-		// Construct a camera ray originatinf from the defocus disk and directed at
-		// a randomly sampled point around the pixel location i, j
 		auto offset = sample_square();
 		auto pixel_sample = pixel00_loc
 			+ ((i + offset.x()) * pixel_delta_u)
 			+ ((j + offset.y()) * pixel_delta_v);
 
-		auto ray_origin = center;
+		auto ray_origin = (defocus_angle <= 0) ? center : defocus_disk_sample();
 		auto ray_direction = pixel_sample - ray_origin;
 
 		return ray(ray_origin, ray_direction);
@@ -114,6 +113,13 @@ private:
 	vec3 sample_square() const
 	{
 		return vec3(random_double() - 0.5, random_double() - 0.5, 0);
+	}
+
+	// Returns a random point in the camera defocus disk
+	vec3 defocus_disk_sample() const
+	{
+		auto p = random_in_unit_disk();
+		return center + (p[0] * defocus_disk_u) + (p[1] * defocus_disk_v);
 	}
 
 	color ray_color(const ray& r, int depth, const hittable& world)
