@@ -17,38 +17,83 @@
 
 #include <windows.h>
 
-void begin_csv(void);
-void write_to_csv(vec3, vec3, vec3, vec3);
 
 int main()
 {
 	hittable_list scene;
 
-	auto ground_mat = make_shared<lambertian>(color(0.8, 0.8, 0.0));
-	auto c_mat = make_shared<lambertian>(color(0.1, 0.2, 0.5));
-	auto l_mat = make_shared<dielectric>(1.50);
-	auto bubble_mat = make_shared<dielectric>(1.00 / 1.50);
-	auto r_mat = make_shared<metal>(color(0.8, 0.6, 0.2), 1.0);
+	auto ground_mat = make_shared<lambertian>(color(0.5, 0.5, 0.5));
+	scene.add(make_shared<sphere>(point3(0, -1000, 0), 1000, ground_mat));
 
-	scene.add(make_shared<sphere>(point3(0.0, -100.5, -1.0), 100.0, ground_mat));
-	scene.add(make_shared<sphere>(point3(0.0, 0.0, -1.2), 0.5, c_mat));
-	scene.add(make_shared<sphere>(point3(-1.0, 0.0, -1.0), 0.5, l_mat));
-	scene.add(make_shared<sphere>(point3(-1.0, 0.0, -1.0), 0.4, bubble_mat));
-	scene.add(make_shared<sphere>(point3(1.0, 0.0, -1.0), 0.5, r_mat));
+	for (int a = -11; a < 11; a++)
+	{
+		for (int b = -11; b < 11; b++)
+		{
+			auto choose_mat = random_double();
+			point3 center(a + 0.9 * random_double(), 0.2, b + 0.9 * random_double());
+
+			if ((center - point3(4, 0.2, 0)).length() > 0.9)
+			{
+				shared_ptr<material> sphere_mat;
+				
+				if (choose_mat < 0.8)
+				{
+					// diffuse
+					auto albedo = color::random() * color::random();
+					sphere_mat = make_shared<lambertian>(albedo);
+				}
+				else if (choose_mat < 0.95)
+				{
+					// metal
+					auto albedo = color::random(0.5, 1);
+					auto fuzz = random_double(0, 0.5);
+					sphere_mat = make_shared<metal>(albedo, fuzz);
+				}
+				else
+				{
+					// glass
+					sphere_mat = make_shared<dielectric>(1.5);
+				}
+				scene.add(make_shared<sphere>(center, 0.2, sphere_mat));
+			}
+
+			
+		}
+	}
+
+	auto mat1 = make_shared<dielectric>(1.5);
+	scene.add(make_shared<sphere>(point3(0, 1, 0), 1.0, mat1));
+
+	auto mat2 = make_shared<lambertian>(color(0.4, 0.2, 0.1));
+	scene.add(make_shared<sphere>(point3(-4, 1, 0), 1.0, mat2));
+
+	auto mat3 = make_shared<metal>(color(0.7, 0.6, 0.5), 0.0);
+	scene.add(make_shared<sphere>(point3(4, 1, 0), 1.0, mat3));
+
 	camera cam;
 
 	cam.aspect_ratio = 16.0 / 9.0;
-	cam.image_width = 400;
-	cam.samples_per_pixel = 100;
+	cam.image_width = 1200;
+	cam.samples_per_pixel = 500;
 	cam.max_depth = 50;
 
 	cam.vfov = 20;
-	cam.lookfrom = point3(-2, 2, 1);
-	cam.lookat = point3(0, 0, -1);
+	cam.lookfrom = point3(13, 2, 3);
+	cam.lookat = point3(0, 0, 0);
 	cam.vup = vec3(0, 1, 0);
 
-	//cam.render(scene);
-	int samps = 100000;
+	cam.defocus_angle = 0.6;
+	cam.focus_dist = 10.0;
+
+	cam.render(scene);
+}
+
+void begin_csv(void);
+void write_to_csv(vec3, vec3, vec3, vec3);
+void csv_ray_distribution(int);
+
+void csv_ray_distribution(int samps)
+{
 	vec3 norm = vec3(0, 1, 0);
 
 	begin_csv();
@@ -56,11 +101,10 @@ int main()
 	for (int i = 0; i < samps; i++)
 	{
 		write_to_csv(random_on_hemisphere(norm) * vec3(1, 2, 1),
-					 norm + random_unit_vector(),
-					 norm + random_in_unit_sphere(),
-					 norm);
+			norm + random_unit_vector(),
+			norm + random_in_unit_sphere(),
+			norm);
 	}
-
 }
 
 void begin_csv()
