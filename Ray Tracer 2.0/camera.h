@@ -2,7 +2,11 @@
 #define CAMERA_H
 
 #include "hittable.h"
+#include "hittable_list.h"
 #include "material.h"
+#include <omp.h>
+#include <thread>
+#include <vector>
 
 class camera
 {
@@ -20,25 +24,31 @@ class camera
 	double defocus_angle = 0; // Variation angle of rays through each pixel
 	double focus_dist = 10;   // Distance from camera lookfrom point to plane of perfect focus
 
-	void render(const hittable& world)
+	// Render the image
+	void render(const hittable& scene)
 	{
 		initialize();
 
-		// Rendering the image
-		std::cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
-
+		// Dynamically send each pixel row to the next free thread, utilizes all threads by default
+		#pragma omp parallel for shared(scene) schedule(dynamic)
 		for (int j = 0; j < image_height; j++)
 		{
-			std::clog << "\rScanlines remaining: " << (image_height - j) << ' ' << std::flush;
+			// Print how many horizontal lines are left to render
+			if (omp_get_thread_num() == 0)
+				std::clog << "\rScanlines remaining: " << (image_height - j) << std::flush;
+
+			// Iterate through each pixel in the row
+			for (int i = 0; i < image_width; i++)
+				shade_pixel(i, j, scene);
+		}
+
+		// Write colors out to the image file
+		write_header(image_width, image_height);
+		for (int j = 0; j < image_height; j++)
+		{
 			for (int i = 0; i < image_width; i++)
 			{
-				color pixel_color(0, 0, 0);
-				for (int sample = 0; sample < samples_per_pixel; sample++)
-				{
-					ray r = get_ray(i, j);
-					pixel_color += ray_color(r, max_depth, world);
-				}
-				write_color(std::cout, pixel_samples_scale * pixel_color);
+				write_color(std::cout, color_buffer[i][j]);
 			}
 		}
 
@@ -55,11 +65,14 @@ private:
 	vec3 u, v, w;				// Camera frame basis vectors
 	vec3 defocus_disk_u;		// Defocus disk horizontal radius
 	vec3 defocus_disk_v;		// Defocus disk vertical radius
+	std::vector<std::vector<color>> color_buffer; // Color buffer for parallelization
 
 	void initialize()
 	{
 		image_height = int(image_width / aspect_ratio);
 		image_height = (image_height < 1) ? 1 : image_height; // ensure >= 1
+		
+		color_buffer = std::vector<std::vector<color>>(image_width, std::vector<color>(image_height, color(0, 0, 0)));
 
 		pixel_samples_scale = 1.0 / samples_per_pixel;
 
@@ -108,6 +121,17 @@ private:
 		auto ray_direction = pixel_sample - ray_origin;
 
 		return ray(ray_origin, ray_direction);
+	}
+
+	void shade_pixel(int i, int j, const hittable& scene)
+	{
+		color_buffer[i][j] = color(0, 0, 0);
+		for (int sample = 0; sample < samples_per_pixel; sample++)
+		{
+			ray r = get_ray(i, j);
+			color_buffer[i][j] += ray_color(r, max_depth, scene);
+		}
+		color_buffer[i][j] = pixel_samples_scale * color_buffer[i][j];
 	}
 
 	// Returns the vector to a random point in the [-.5,-.5],[+.5,+.5] unit square

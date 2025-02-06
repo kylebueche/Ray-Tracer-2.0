@@ -14,6 +14,11 @@ inline double linear_to_gamma(double linear_component)
 	return 0;
 }
 
+void write_header(int image_width, int image_height)
+{
+	std::cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
+}
+
 void write_color(std::ostream& out, const color& pixel_color)
 {
 	auto r = pixel_color.x();
