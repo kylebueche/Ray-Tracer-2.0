@@ -36,13 +36,13 @@ int main()
 			{
 				shared_ptr<material> sphere_mat;
 				
-				if (choose_mat < 0.8)
+				if (choose_mat < 0.1)
 				{
 					// diffuse
 					auto albedo = color::random() * color::random();
 					sphere_mat = make_shared<lambertian>(albedo);
 				}
-				else if (choose_mat < 0.95)
+				else if (choose_mat < 0.50)
 				{
 					// metal
 					auto albedo = color::random(0.5, 1);

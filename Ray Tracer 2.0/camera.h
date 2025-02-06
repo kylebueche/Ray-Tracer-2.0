@@ -5,7 +5,6 @@
 #include "hittable_list.h"
 #include "material.h"
 #include <omp.h>
-#include <thread>
 #include <vector>
 
 class camera
@@ -29,13 +28,16 @@ class camera
 	{
 		initialize();
 
+		float scanlines_ratio = 1.0f / image_height;
+
 		// Dynamically send each pixel row to the next free thread, utilizes all threads by default
+		std::clog << "Computing...\n";
 		#pragma omp parallel for shared(scene) schedule(dynamic)
 		for (int j = 0; j < image_height; j++)
 		{
 			// Print how many horizontal lines are left to render
 			if (omp_get_thread_num() == 0)
-				std::clog << "\rScanlines remaining: " << (image_height - j) << std::flush;
+				std::clog << "\rPercent complete: " << (int) (100 * scanlines_ratio * j) << "%" << std::flush;
 
 			// Iterate through each pixel in the row
 			for (int i = 0; i < image_width; i++)
@@ -43,9 +45,11 @@ class camera
 		}
 
 		// Write colors out to the image file
+		std::clog << "\nWriting file...\n";
 		write_header(image_width, image_height);
 		for (int j = 0; j < image_height; j++)
 		{
+			std::clog << "\rPercent complete: " << (int) (100 * scanlines_ratio * j) << "%" << std::flush;
 			for (int i = 0; i < image_width; i++)
 			{
 				write_color(std::cout, color_buffer[i][j]);

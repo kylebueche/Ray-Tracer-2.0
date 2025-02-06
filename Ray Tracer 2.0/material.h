@@ -23,7 +23,7 @@ public:
 
 	bool scatter(const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered) const override 
 	{
-		auto scatter_direction = rec.normal + random_unit_vector();
+		auto scatter_direction = rec.normal + random_in_unit_sphere();
 		
 		// Catch degenerate scatter direction
 		if (scatter_direction.near_zero())
