@@ -13,11 +13,13 @@ public:
 		return max - min;
 	}
 
+	// Contains the value, including endpoints
 	bool contains(double x) const
 	{
 		return min <= x && x <= max;
 	}
 
+	// Contains the value, not including endpoints
 	bool surrounds(double x) const
 	{
 		return min < x && x < max;
