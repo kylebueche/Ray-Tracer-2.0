@@ -12,11 +12,10 @@ class hit_record
 	double t;
 	bool front_face;
 
+	// Set the hit record's normal vector.
+	// Assumes normalized vectors.
 	void set_face_normal(const ray& r, const vec3& outward_normal)
 	{
-		// Sets the hit record's normal vector.
-		// NOTE: The parameter 'outward_normal' is assumed to have unit length.
-
 		front_face = dot(r.direction(), outward_normal) < 0;
 		normal = front_face ? outward_normal : -outward_normal;
 	}

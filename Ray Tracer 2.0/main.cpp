@@ -23,7 +23,7 @@ int main()
 	hittable_list scene;
 
 	auto ground_mat = make_shared<lambertian>(color(0.5, 0.5, 0.5));
-	scene.add(make_shared<sphere>(point3(0, -1000, 0), 1000, ground_mat));
+	scene.add(make_shared<plane>(point3(0, 0, 0), vec3(0, 1, 0), ground_mat));
 
 	for (int a = -11; a < 11; a++)
 	{
@@ -36,13 +36,13 @@ int main()
 			{
 				shared_ptr<material> sphere_mat;
 				
-				if (choose_mat < 0.1)
+				if (choose_mat < 0.10)
 				{
 					// diffuse
 					auto albedo = color::random() * color::random();
 					sphere_mat = make_shared<lambertian>(albedo);
 				}
-				else if (choose_mat < 0.50)
+				else if (choose_mat < 0.95)
 				{
 					// metal
 					auto albedo = color::random(0.5, 1);
@@ -74,8 +74,8 @@ int main()
 
 	cam.aspect_ratio = 16.0 / 9.0;
 	cam.image_width = 800;
-	cam.samples_per_pixel = 50;
-	cam.max_depth = 25;
+	cam.samples_per_pixel = 16;
+	cam.max_depth = 4;
 
 	cam.vfov = 20;
 	cam.lookfrom = point3(13, 2, 3);

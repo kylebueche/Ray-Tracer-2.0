@@ -164,7 +164,13 @@ private:
 			ray scattered;
 			color attenuation;
 			if (rec.mat->scatter(r, rec, attenuation, scattered))
+			{
+				// Dont bother recursion if the values will be 0 anyways
+				if (attenuation.near_zero())
+					return attenuation;
+				// Otherwise, recursion time >:)
 				return attenuation * ray_color(scattered, depth - 1, world);
+			}
 			return color(0, 0, 0);
 		}
 
