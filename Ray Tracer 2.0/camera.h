@@ -10,8 +10,9 @@
 class camera
 {
   public:
-	double aspect_ratio = 1.0;
 	int image_width = 100;
+	int image_height = 100;
+
 	int samples_per_pixel = 10;
 	int max_depth = 10; // recursive ray depth (max bounces)
 
@@ -28,8 +29,6 @@ class camera
 	{
 		initialize();
 
-		float scanlines_ratio = 1.0f / image_height;
-
 		// Dynamically send each pixel row to the next free thread, utilizes all threads by default
 		std::clog << "Computing...\n";
 		#pragma omp parallel for shared(scene) schedule(dynamic)
@@ -37,7 +36,7 @@ class camera
 		{
 			// Print how many horizontal lines are left to render
 			if (omp_get_thread_num() == 0)
-				std::clog << "\rPercent complete: " << (int) (100 * scanlines_ratio * j) << "%" << std::flush;
+				std::clog << "\rPercent complete: " << (int) (100.0 * j / image_height) << "%" << std::flush;
 
 			// Iterate through each pixel in the row
 			for (int i = 0; i < image_width; i++)
@@ -49,7 +48,7 @@ class camera
 		write_header(image_width, image_height);
 		for (int j = 0; j < image_height; j++)
 		{
-			std::clog << "\rPercent complete: " << (int) (100 * scanlines_ratio * j) << "%" << std::flush;
+			std::clog << "\rPercent complete: " << (int) (100.0 * j / image_height) << "%" << std::flush;
 			for (int i = 0; i < image_width; i++)
 			{
 				write_color(std::cout, color_buffer[i][j]);
@@ -60,7 +59,6 @@ class camera
 	}
 
 private:
-	int image_height;			// Rendered image height
 	double pixel_samples_scale;	// Color scale factor for a sum of pixel samples
 	point3 center;				// Camera center
 	point3 pixel00_loc;			// Location of pixel 0, 0
@@ -73,16 +71,16 @@ private:
 
 	void initialize()
 	{
-		image_height = int(image_width / aspect_ratio);
-		image_height = (image_height < 1) ? 1 : image_height; // ensure >= 1
-		
+		/* Ensure height and width are >= 1, and initialize color buffer with dimensions */
+		image_width = (image_width < 1) ? 1 : image_width;
+		image_height = (image_height < 1) ? 1 : image_height;
 		color_buffer = std::vector<std::vector<color>>(image_width, std::vector<color>(image_height, color(0, 0, 0)));
 
+		/* Predivide ratio for averaging, because iterated division is slow */
 		pixel_samples_scale = 1.0 / samples_per_pixel;
-
 		center = lookfrom;
 
-		// Determine viewport dimensions
+		/* Determine viewport dimensions */
 		auto theta = degrees_to_radians(vfov);
 		auto h = std::tan(theta / 2);
 		auto viewport_height = 2 * h * focus_dist;
@@ -166,8 +164,8 @@ private:
 			if (rec.mat->scatter(r, rec, attenuation, scattered))
 			{
 				// Dont bother recursion if the values will be 0 anyways
-				if (attenuation.near_zero())
-					return attenuation;
+				//if (attenuation.near_zero())
+					//return attenuation;
 				// Otherwise, recursion time >:)
 				return attenuation * ray_color(scattered, depth - 1, world);
 			}
@@ -178,6 +176,49 @@ private:
 		auto a = 0.5 * (unit_direction.y() + 1.0);
 		return (1.0 - a) * color(1.0, 1.0, 1.0) + a * color(0.5, 0.7, 1.0);
 	}
+};
+
+class standard_camera : public camera
+{
+public:
+
+	double aspect_ratio = 1.0;
+	bool auto_height = false; // Whether or not to use aspect ratio to determine height
+
+	void render(const hittable& scene)
+	{
+		if (auto_height)
+			image_height = int(image_width / aspect_ratio);
+		camera::render(scene);
+	}
+
+	void set_dimensions(int width, int height)
+	{
+		auto_height = false;
+		image_width = width;
+		image_height = height;
+	}
+
+	/* 240p, 320x240, 4.0/3.0 */
+	void setLD() { set_dimensions(320, 240); }
+
+	/* 480p, 640x480, 4.0/3.0 */
+	void setSD() { set_dimensions(640, 480); }
+
+	/* 720p, 1280x720, 16.0/9.0 */
+	void setHD() { set_dimensions(1280, 720); }
+
+	/* 1080p, 1920x1080, 16.0/9.0 */
+	void setFHD() { set_dimensions(1920, 1080); }
+
+	/* 1440p, 2560x1440, 16.0/9.0 */
+	void setQHD() { set_dimensions(2560, 1440); }
+
+	/* 4K, 3840x2160, 16.0/9.0 */
+	void setUHD() { set_dimensions(3840, 2160); }
+
+	/* DCI 4K, 4096x2160 (Cinema Standard), 256.0/135.0 */
+	void setDCI4K() { set_dimensions(4096, 2160); }
 
 };
 
