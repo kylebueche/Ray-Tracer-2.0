@@ -14,11 +14,20 @@
 #include "hittable_list.h"
 #include "material.h"
 #include "sphere.h"
+#include "plane.h"
+#include "infinite_cone.h"
 
 #include <windows.h>
 
+void intersection_geometry_scene(void);
 
 int main()
+{
+	intersection_geometry_scene();
+}
+
+
+void intersection_geometry_scene()
 {
 	hittable_list scene;
 
@@ -36,7 +45,7 @@ int main()
 	shared_ptr<hittable_intersection> intersection = make_shared<hittable_intersection>();
 	auto cone_mat = make_shared<lambertian>(color(1, 0.0, 0.0));
 	auto cone_mat_shiny = make_shared<metal>(color(0.9, 0.1, 0.1), 0.01);
-	intersection->add(make_shared<angular_plane>(point3(4, 0.0, 8.0), vec3(0, 1, 0), degrees_to_radians(30), cone_mat));
+	intersection->add(make_shared<infinite_cone>(point3(4, 0.0, 8.0), vec3(0, 1, 0), degrees_to_radians(30), cone_mat));
 	intersection->add(make_shared<sphere>(point3(4, 1.0, 8), 1.0, cone_mat));
 	intersection->add(make_shared<plane>(point3(4, 1.4, 8.6), vec3(0.3, 0.2, 1), cone_mat));
 	scene.add(intersection);
@@ -93,10 +102,10 @@ int main()
 
 	standard_camera cam;
 
-	cam.setDCI4K();
+	cam.setLD();
 
-	cam.samples_per_pixel = 100;
-	cam.max_depth = 25;
+	cam.samples_per_pixel = 10;
+	cam.max_depth = 15;
 
 	cam.vfov = 30;
 	cam.lookfrom = point3(20, 3, 20);

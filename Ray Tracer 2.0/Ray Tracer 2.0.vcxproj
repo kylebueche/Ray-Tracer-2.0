@@ -134,8 +134,11 @@
   <ItemGroup>
     <ClInclude Include="camera.h" />
     <ClInclude Include="color.h" />
+    <ClInclude Include="cone.h" />
+    <ClInclude Include="infinite_cone.h" />
     <ClInclude Include="interval.h" />
     <ClInclude Include="material.h" />
+    <ClInclude Include="plane.h" />
     <ClInclude Include="rtproject.h" />
     <ClInclude Include="hittable.h" />
     <ClInclude Include="hittable_list.h" />
