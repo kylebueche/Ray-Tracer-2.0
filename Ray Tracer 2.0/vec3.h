@@ -50,7 +50,6 @@ class vec3
 	// Return true if the vector is close to zero in all dimensions
 	bool near_zero() const
 	{
-		auto epsilon = 1e-8;
 		return (std::fabs(e[0]) < epsilon)
 			&& (std::fabs(e[1]) < epsilon)
 			&& (std::fabs(e[2]) < epsilon);
@@ -142,7 +141,7 @@ inline vec3 random_unit_vector()
 	{
 		auto p = vec3::random(-1, 1);
 		auto lensq = p.length_squared();
-		if (1e-160 < lensq && lensq <= 1)
+		if (epsilon < lensq && lensq <= 1)
 			return p / sqrt(lensq);
 	}
 }
@@ -153,7 +152,7 @@ inline vec3 random_in_unit_sphere()
 	{
 		auto p = vec3::random(-1, 1);
 		auto lensq = p.length_squared();
-		if (1e-160 < lensq && lensq <= 1)
+		if (epsilon < lensq && lensq <= 1)
 			return p;
 	}
 }

@@ -42,6 +42,7 @@ class camera
 			for (int i = 0; i < image_width; i++)
 				shade_pixel(i, j, scene);
 		}
+		std::clog << "\rPercent complete: " << "100%" << std::flush;
 
 		// Write colors out to the image file
 		std::clog << "\nWriting file...\n";
@@ -110,7 +111,7 @@ private:
 	}
 
 
-	// Construct a camera ray originatinf from the defocus disk and directed at
+	// Construct a camera ray originating from the defocus disk and directed at
 	// a randomly sampled point around the pixel location i, j
 	ray get_ray(int i, int j) const
 	{
@@ -125,6 +126,7 @@ private:
 		return ray(ray_origin, ray_direction);
 	}
 
+	/* Shades a pixel in a pixel buffer */
 	void shade_pixel(int i, int j, const hittable& scene)
 	{
 		color_buffer[i][j] = color(0, 0, 0);
@@ -174,7 +176,7 @@ private:
 
 		vec3 unit_direction = unit_vector(r.direction());
 		auto a = 0.5 * (unit_direction.y() + 1.0);
-		return (1.0 - a) * color(1.0, 1.0, 1.0) + a * color(0.5, 0.7, 1.0);
+		return ((1.0 - a) * color(1.0, 1.0, 1.0) + a * color(0.5, 0.7, 1.0));
 	}
 };
 

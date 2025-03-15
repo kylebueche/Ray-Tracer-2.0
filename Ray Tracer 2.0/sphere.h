@@ -15,12 +15,10 @@ class sphere : public hittable
 		double a = ray.direction().length_squared();
 		double b = -2.0 * dot(ray.direction(), oc);
 		double c = oc.length_squared() - radius * radius;
-		auto hit_occured =  solve_quadratic(ray, ray_bounds, rec, a, b, c);
+		bool hit_occured =  solve_quadratic(ray, ray_bounds, rec, a, b, c);
 		if (hit_occured)
 		{
-			rec.p = ray.at(rec.t);
-			vec3 outward_normal = (rec.p - center) / radius;
-			rec.set_face_normal(ray, outward_normal);
+			rec.set_face_normal(ray, (rec.p - center) / radius);
 			rec.mat = mat;
 		}
 		return hit_occured;

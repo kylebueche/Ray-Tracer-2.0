@@ -34,11 +34,11 @@ class hittable {
 /* Solves the quadratic equation for t given an a, b, and c, returns the first hit in the ray's bounds*/
 bool solve_quadratic(const ray& ray, interval ray_bounds, hit_record& record, double a, double b, double c)
 {
-	auto h = -2.0 * b; // Simplifies the quadratic equation with substitution
+	auto h = -0.5 * b; // Simplifies the quadratic equation with substitution
 	auto inside_sqrt = h * h - a * c;
 
 	// No intersection OR infinite intersection
-	if (inside_sqrt < 0.0 || a == 0.0)
+	if (inside_sqrt < 0.0 || (a < epsilon && a > -epsilon))
 	{
 		return false;
 	}
@@ -46,8 +46,8 @@ bool solve_quadratic(const ray& ray, interval ray_bounds, hit_record& record, do
 	auto sqrtd = std::sqrt(inside_sqrt);
 
 	// Ensure t0 is the closer intersection. If the denominator is negative, this will happen
-	double t0 = (-b - sqrtd) / a;
-	double t1 = (-b + sqrtd) / a;
+	double t0 = (h - sqrtd) / a;
+	double t1 = (h + sqrtd) / a;
 	if (t0 > t1) std::swap(t0, t1);
 
 	// Find the nearest root in our range.

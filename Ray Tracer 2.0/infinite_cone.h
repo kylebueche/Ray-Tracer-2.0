@@ -28,19 +28,21 @@ public:
 		double b = 2 * ((axis_dot_raydir * axis_dot_center_to_rayorig) - cos_sqr * dot(center_to_rayorig, ray.direction()));
 		double c = axis_dot_center_to_rayorig * axis_dot_center_to_rayorig - cos_sqr * (ray.origin().length_squared() - 2 * dot(ray.origin(), center) + center.length_squared());
 
-		solve_quadratic(ray, ray_bounds, record, a, b, c);
-		if (dot(record.p - center, axis) < 0.0)
-			return false;
-		record.set_face_normal(ray, unit_vector(cross(record.p, cross(record.p, normal_axis))));
-		record.mat = mat;
-		//record.hit(ray, t0, mat, normal);
-		return true;
+		bool hit_occured = solve_quadratic(ray, ray_bounds, record, a, b, c);
+		if (hit_occured)
+		{
+			if (dot(record.p - center, axis) < 0.0)
+				return false;
+			record.set_face_normal(ray, unit_vector(cross(record.p, cross(record.p, normal_axis))));
+			record.mat = mat;
+		}
+		return hit_occured;
 	}
 
 	/* Implicit volume in the direction of the axis, in a given zenith around the axis */
 	virtual bool volume_contains(const point3 p) const override
 	{
-		return dot(unit_vector(p - center), unit_vector(axis)) > cos(angle);
+		return dot(unit_vector(p - center), unit_vector(axis)) > cos(degrees_to_radians(angle));
 	}
 
 private:

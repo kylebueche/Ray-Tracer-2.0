@@ -20,12 +20,52 @@
 #include <windows.h>
 
 void intersection_geometry_scene(void);
+void cone_scene(void);
+void csv_ray_distribution(int);
 
 int main()
 {
-	intersection_geometry_scene();
+	//cone_scene();
+	csv_ray_distribution(100000);
 }
 
+void cone_scene()
+{
+	hittable_list scene;
+
+	auto ground_mat = make_shared<lambertian>(color(0.5, 0.8, 0.5));
+	scene.add(make_shared<plane>(point3(0, 0, 0), vec3(0, 1, 0), ground_mat));
+
+	for (int i = 0; i < 3; i++)
+	{
+		double z = i * 2.1 - 2.1;
+		double angle = i * 20 + 20;
+		shared_ptr<hittable_intersection> inter = make_shared<hittable_intersection>();
+		auto cone_mat_shiny = make_shared<lambertian>(color(0.9, 0.1, 0.1));
+		inter->add(make_shared<infinite_cone>(point3(0.0, 0.0, z), vec3(0, 1, 0), angle, cone_mat_shiny));
+		inter->add(make_shared<infinite_cone>(point3(0.0, 0.01, z), vec3(0, -1, 0), 180 - angle, cone_mat_shiny));
+		inter->add(make_shared<sphere>(point3(0.0, 1.0, z), 1.0, cone_mat_shiny));
+		scene.add(inter);
+
+		auto mat1 = make_shared<dielectric>(1.0001);
+		scene.add(make_shared<sphere>(point3(0, 1, z), 1.001, mat1));
+	}
+	standard_camera cam;
+
+	cam.setSD();
+
+	cam.samples_per_pixel = 100;
+	cam.max_depth = 15;
+
+	cam.vfov = 35;
+	cam.lookfrom = point3(7.75, 2.25, 0);
+	cam.lookat = point3(0, 1, 0);
+	cam.vup = vec3(0, 1, 0);
+
+	cam.defocus_angle = 0.0;
+	cam.focus_dist = (cam.lookat - cam.lookfrom).length();
+	cam.render(scene);
+}
 
 void intersection_geometry_scene()
 {
@@ -45,7 +85,7 @@ void intersection_geometry_scene()
 	shared_ptr<hittable_intersection> intersection = make_shared<hittable_intersection>();
 	auto cone_mat = make_shared<lambertian>(color(1, 0.0, 0.0));
 	auto cone_mat_shiny = make_shared<metal>(color(0.9, 0.1, 0.1), 0.01);
-	intersection->add(make_shared<infinite_cone>(point3(4, 0.0, 8.0), vec3(0, 1, 0), degrees_to_radians(30), cone_mat));
+	intersection->add(make_shared<infinite_cone>(point3(4, 0.0, 8.0), vec3(0, 1, 0), 30, cone_mat));
 	intersection->add(make_shared<sphere>(point3(4, 1.0, 8), 1.0, cone_mat));
 	intersection->add(make_shared<plane>(point3(4, 1.4, 8.6), vec3(0.3, 0.2, 1), cone_mat));
 	scene.add(intersection);
@@ -104,7 +144,7 @@ void intersection_geometry_scene()
 
 	cam.setLD();
 
-	cam.samples_per_pixel = 10;
+	cam.samples_per_pixel = 100;
 	cam.max_depth = 15;
 
 	cam.vfov = 30;
@@ -183,7 +223,18 @@ void rt_one_weekend_final_scene() {
 
 void begin_csv(void);
 void write_to_csv(vec3, vec3, vec3, vec3);
-void csv_ray_distribution(int);
+
+vec3 random_on_cylinder(void);
+vec3 random_on_cylinder()
+{
+
+	while (true)
+	{
+		auto p = vec3(random_double(-1, 1), 0, random_double(-1, 1));
+		if (p.length_squared() < 1)
+			return (p / p.length()) + vec3(0, std::rand(), 0);
+	}
+}
 
 void csv_ray_distribution(int samps)
 {
@@ -193,7 +244,7 @@ void csv_ray_distribution(int samps)
 
 	for (int i = 0; i < samps; i++)
 	{
-		write_to_csv(random_on_hemisphere(norm) * vec3(1, 2, 1),
+		write_to_csv(random_on_cylinder(),//random_on_hemisphere(norm) * vec3(1, 2, 1),
 			norm + random_unit_vector(),
 			norm + random_in_unit_sphere(),
 			norm);
@@ -208,7 +259,8 @@ void begin_csv()
 
 void write_to_csv(vec3 onhemi, vec3 onsphere, vec3 insphere, vec3 normal)
 {
-	std::cout << onhemi.e[0] << "," << onhemi.e[1] << "," << onhemi.e[2] << "," << dot(normal, unit_vector(onhemi)) << ", ,";
-	std::cout << onsphere.e[0] << "," << onsphere.e[1] << "," << onsphere.e[2] << "," << dot(normal, unit_vector(onsphere)) << ", ,";
-	std::cout << insphere.e[0] << "," << insphere.e[1] << "," << insphere.e[2] << "," << dot(normal, unit_vector(insphere)) << "\n";
+	std::cout << onhemi.e[0] << "," << onhemi.e[1] << "," << onhemi.e[2] << "," << dot(normal, unit_vector(onhemi)) << "\n";
+	//std::cout << onhemi.e[0] << "," << onhemi.e[1] << "," << onhemi.e[2] << "," << dot(normal, unit_vector(onhemi)) << ", ,";
+	//std::cout << onsphere.e[0] << "," << onsphere.e[1] << "," << onsphere.e[2] << "," << dot(normal, unit_vector(onsphere)) << ", ,";
+	//std::cout << insphere.e[0] << "," << insphere.e[1] << "," << insphere.e[2] << "," << dot(normal, unit_vector(insphere)) << "\n";
 }
