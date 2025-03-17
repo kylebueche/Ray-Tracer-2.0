@@ -5,6 +5,8 @@
 
 output/*
 obj_files/*
+!output/.gitkeep
+!obj_files/.gitkeep
 
 *.o
 *.exe
