@@ -1,0 +1,207 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\kyleb\\Desktop\\Ray-Tracer-2.0\\Ray Tracer 2.0\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{1C19E4A8-10FE-47AC-8B57-A08A1FDD9C3B}|Ray Tracer 2.0.vcxproj|C:\\Users\\kyleb\\Desktop\\Ray-Tracer-2.0\\Ray Tracer 2.0\\main.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{1C19E4A8-10FE-47AC-8B57-A08A1FDD9C3B}|Ray Tracer 2.0.vcxproj|solutionrelative:main.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{1C19E4A8-10FE-47AC-8B57-A08A1FDD9C3B}|Ray Tracer 2.0.vcxproj|C:\\Users\\kyleb\\Desktop\\Ray-Tracer-2.0\\Ray Tracer 2.0\\hittable_list.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{1C19E4A8-10FE-47AC-8B57-A08A1FDD9C3B}|Ray Tracer 2.0.vcxproj|solutionrelative:hittable_list.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{1C19E4A8-10FE-47AC-8B57-A08A1FDD9C3B}|Ray Tracer 2.0.vcxproj|C:\\Users\\kyleb\\Desktop\\Ray-Tracer-2.0\\Ray Tracer 2.0\\hittable.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{1C19E4A8-10FE-47AC-8B57-A08A1FDD9C3B}|Ray Tracer 2.0.vcxproj|solutionrelative:hittable.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{1C19E4A8-10FE-47AC-8B57-A08A1FDD9C3B}|Ray Tracer 2.0.vcxproj|C:\\Users\\kyleb\\Desktop\\Ray-Tracer-2.0\\Ray Tracer 2.0\\camera.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{1C19E4A8-10FE-47AC-8B57-A08A1FDD9C3B}|Ray Tracer 2.0.vcxproj|solutionrelative:camera.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{1C19E4A8-10FE-47AC-8B57-A08A1FDD9C3B}|Ray Tracer 2.0.vcxproj|C:\\Users\\kyleb\\Desktop\\Ray-Tracer-2.0\\Ray Tracer 2.0\\material.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{1C19E4A8-10FE-47AC-8B57-A08A1FDD9C3B}|Ray Tracer 2.0.vcxproj|solutionrelative:material.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{1C19E4A8-10FE-47AC-8B57-A08A1FDD9C3B}|Ray Tracer 2.0.vcxproj|C:\\Users\\kyleb\\Desktop\\Ray-Tracer-2.0\\Ray Tracer 2.0\\sphere.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{1C19E4A8-10FE-47AC-8B57-A08A1FDD9C3B}|Ray Tracer 2.0.vcxproj|solutionrelative:sphere.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{1C19E4A8-10FE-47AC-8B57-A08A1FDD9C3B}|Ray Tracer 2.0.vcxproj|C:\\Users\\kyleb\\Desktop\\Ray-Tracer-2.0\\Ray Tracer 2.0\\rtproject.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{1C19E4A8-10FE-47AC-8B57-A08A1FDD9C3B}|Ray Tracer 2.0.vcxproj|solutionrelative:rtproject.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{1C19E4A8-10FE-47AC-8B57-A08A1FDD9C3B}|Ray Tracer 2.0.vcxproj|C:\\Users\\kyleb\\Desktop\\Ray-Tracer-2.0\\Ray Tracer 2.0\\infinite_cone.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{1C19E4A8-10FE-47AC-8B57-A08A1FDD9C3B}|Ray Tracer 2.0.vcxproj|solutionrelative:infinite_cone.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{1C19E4A8-10FE-47AC-8B57-A08A1FDD9C3B}|Ray Tracer 2.0.vcxproj|C:\\Users\\kyleb\\Desktop\\Ray-Tracer-2.0\\Ray Tracer 2.0\\vec3.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{1C19E4A8-10FE-47AC-8B57-A08A1FDD9C3B}|Ray Tracer 2.0.vcxproj|solutionrelative:vec3.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{1C19E4A8-10FE-47AC-8B57-A08A1FDD9C3B}|Ray Tracer 2.0.vcxproj|C:\\Users\\kyleb\\Desktop\\Ray-Tracer-2.0\\Ray Tracer 2.0\\color.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{1C19E4A8-10FE-47AC-8B57-A08A1FDD9C3B}|Ray Tracer 2.0.vcxproj|solutionrelative:color.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{1C19E4A8-10FE-47AC-8B57-A08A1FDD9C3B}|Ray Tracer 2.0.vcxproj|C:\\Users\\kyleb\\Desktop\\Ray-Tracer-2.0\\Ray Tracer 2.0\\cone.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{1C19E4A8-10FE-47AC-8B57-A08A1FDD9C3B}|Ray Tracer 2.0.vcxproj|solutionrelative:cone.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 9,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:2:0:{b9f91511-5ca5-40ec-9726-f3e3a7e534e2}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "hittable_list.h",
+              "DocumentMoniker": "C:\\Users\\kyleb\\Desktop\\Ray-Tracer-2.0\\Ray Tracer 2.0\\hittable_list.h",
+              "RelativeDocumentMoniker": "hittable_list.h",
+              "ToolTip": "C:\\Users\\kyleb\\Desktop\\Ray-Tracer-2.0\\Ray Tracer 2.0\\hittable_list.h",
+              "RelativeToolTip": "hittable_list.h",
+              "ViewState": "AgIAAAQAAAAAAAAAAAAAAAoAAAAhAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2025-02-25T22:41:50.327Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "color.h",
+              "DocumentMoniker": "C:\\Users\\kyleb\\Desktop\\Ray-Tracer-2.0\\Ray Tracer 2.0\\color.h",
+              "RelativeDocumentMoniker": "color.h",
+              "ToolTip": "C:\\Users\\kyleb\\Desktop\\Ray-Tracer-2.0\\Ray Tracer 2.0\\color.h",
+              "RelativeToolTip": "color.h",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABwAAAAYAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2025-02-06T04:41:42.482Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "vec3.h",
+              "DocumentMoniker": "C:\\Users\\kyleb\\Desktop\\Ray-Tracer-2.0\\Ray Tracer 2.0\\vec3.h",
+              "RelativeDocumentMoniker": "vec3.h",
+              "ToolTip": "C:\\Users\\kyleb\\Desktop\\Ray-Tracer-2.0\\Ray Tracer 2.0\\vec3.h",
+              "RelativeToolTip": "vec3.h",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAADsAAAAaAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2025-02-16T10:35:48.996Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "infinite_cone.h",
+              "DocumentMoniker": "C:\\Users\\kyleb\\Desktop\\Ray-Tracer-2.0\\Ray Tracer 2.0\\infinite_cone.h",
+              "RelativeDocumentMoniker": "infinite_cone.h",
+              "ToolTip": "C:\\Users\\kyleb\\Desktop\\Ray-Tracer-2.0\\Ray Tracer 2.0\\infinite_cone.h",
+              "RelativeToolTip": "infinite_cone.h",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAACwAAABaAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2025-02-19T02:43:24.897Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "cone.h",
+              "DocumentMoniker": "C:\\Users\\kyleb\\Desktop\\Ray-Tracer-2.0\\Ray Tracer 2.0\\cone.h",
+              "RelativeDocumentMoniker": "cone.h",
+              "ToolTip": "C:\\Users\\kyleb\\Desktop\\Ray-Tracer-2.0\\Ray Tracer 2.0\\cone.h",
+              "RelativeToolTip": "cone.h",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2025-02-19T02:43:22.607Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "material.h",
+              "DocumentMoniker": "C:\\Users\\kyleb\\Desktop\\Ray-Tracer-2.0\\Ray Tracer 2.0\\material.h",
+              "RelativeDocumentMoniker": "material.h",
+              "ToolTip": "C:\\Users\\kyleb\\Desktop\\Ray-Tracer-2.0\\Ray Tracer 2.0\\material.h",
+              "RelativeToolTip": "material.h",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAIAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2025-02-06T08:21:21.372Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "camera.h",
+              "DocumentMoniker": "C:\\Users\\kyleb\\Desktop\\Ray-Tracer-2.0\\Ray Tracer 2.0\\camera.h",
+              "RelativeDocumentMoniker": "camera.h",
+              "ToolTip": "C:\\Users\\kyleb\\Desktop\\Ray-Tracer-2.0\\Ray Tracer 2.0\\camera.h",
+              "RelativeToolTip": "camera.h",
+              "ViewState": "AgIAABsAAAAAAAAAAAAAADkAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2025-02-05T19:22:07.703Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "sphere.h",
+              "DocumentMoniker": "C:\\Users\\kyleb\\Desktop\\Ray-Tracer-2.0\\Ray Tracer 2.0\\sphere.h",
+              "RelativeDocumentMoniker": "sphere.h",
+              "ToolTip": "C:\\Users\\kyleb\\Desktop\\Ray-Tracer-2.0\\Ray Tracer 2.0\\sphere.h",
+              "RelativeToolTip": "sphere.h",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAAtAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2025-02-16T05:34:11.226Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "main.cpp",
+              "DocumentMoniker": "C:\\Users\\kyleb\\Desktop\\Ray-Tracer-2.0\\Ray Tracer 2.0\\main.cpp",
+              "RelativeDocumentMoniker": "main.cpp",
+              "ToolTip": "C:\\Users\\kyleb\\Desktop\\Ray-Tracer-2.0\\Ray Tracer 2.0\\main.cpp",
+              "RelativeToolTip": "main.cpp",
+              "ViewState": "AgIAAC0AAAAAAAAAAAAAAEIAAAATAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2025-01-26T09:32:37.891Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "hittable.h",
+              "DocumentMoniker": "C:\\Users\\kyleb\\Desktop\\Ray-Tracer-2.0\\Ray Tracer 2.0\\hittable.h",
+              "RelativeDocumentMoniker": "hittable.h",
+              "ToolTip": "C:\\Users\\kyleb\\Desktop\\Ray-Tracer-2.0\\Ray Tracer 2.0\\hittable.h",
+              "RelativeToolTip": "hittable.h",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABEAAAA2AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2025-02-16T09:29:04.53Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "rtproject.h",
+              "DocumentMoniker": "C:\\Users\\kyleb\\Desktop\\Ray-Tracer-2.0\\Ray Tracer 2.0\\rtproject.h",
+              "RelativeDocumentMoniker": "rtproject.h",
+              "ToolTip": "C:\\Users\\kyleb\\Desktop\\Ray-Tracer-2.0\\Ray Tracer 2.0\\rtproject.h",
+              "RelativeToolTip": "rtproject.h",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAAOAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2025-02-06T08:48:25.961Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
