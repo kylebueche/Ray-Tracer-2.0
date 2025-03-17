@@ -7,16 +7,17 @@
 * 
 *************************************************************************/
 
-#include "rtproject.h";
+#include "rtproject.h"
 
 #include "camera.h"
-#include "hittable.h";
+#include "hittable.h"
 #include "hittable_list.h"
 #include "material.h"
 #include "sphere.h"
 #include "plane.h"
 #include "infinite_cone.h"
 
+#include <omp.h>
 #include <windows.h>
 
 void intersection_geometry_scene(void);
@@ -25,17 +26,16 @@ void csv_ray_distribution(int);
 
 int main()
 {
-	//cone_scene();
-	csv_ray_distribution(100000);
+	cone_scene();
 }
 
 void cone_scene()
 {
+
 	hittable_list scene;
 
 	auto ground_mat = make_shared<lambertian>(color(0.5, 0.8, 0.5));
 	scene.add(make_shared<plane>(point3(0, 0, 0), vec3(0, 1, 0), ground_mat));
-
 	for (int i = 0; i < 3; i++)
 	{
 		double z = i * 2.1 - 2.1;

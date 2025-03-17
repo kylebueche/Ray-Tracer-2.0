@@ -1,6 +1,8 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "stb_image_write.h"
 #include "hittable.h"
 #include "hittable_list.h"
 #include "material.h"
@@ -14,7 +16,7 @@ class camera
 	int image_height = 100;
 
 	int samples_per_pixel = 10;
-	int max_depth = 10; // recursive ray depth (max bounces)
+    int max_depth = 10; // recursive ray depth (max bounces)
 
 	double vfov = 90; // Vertical view angle (field of view)
 	point3 lookfrom = point3(0, 0, 0);
@@ -43,18 +45,18 @@ class camera
 				shade_pixel(i, j, scene);
 		}
 		std::clog << "\rPercent complete: " << "100%" << std::flush;
-
+        stbi_write_png("image.png", image_width, image_height, 0, (const void*) color_buffer.data(), sizeof(color) * image_width);
 		// Write colors out to the image file
-		std::clog << "\nWriting file...\n";
-		write_header(image_width, image_height);
-		for (int j = 0; j < image_height; j++)
-		{
-			std::clog << "\rPercent complete: " << (int) (100.0 * j / image_height) << "%" << std::flush;
-			for (int i = 0; i < image_width; i++)
-			{
-				write_color(std::cout, color_buffer[i][j]);
-			}
-		}
+		//std::clog << "\nWriting file...\n";
+		//write_header(image_width, image_height);
+		//for (int j = 0; j < image_height; j++)
+		//{
+			//std::clog << "\rPercent complete: " << (int) (100.0 * j / image_height) << "%" << std::flush;
+			//for (int i = 0; i < image_width; i++)
+			//{
+				//write_color(std::cout, color_buffer[i][j]);
+			//}
+		//}
 
 		std::clog << "\rDone.                 \n";
 	}
@@ -68,14 +70,14 @@ private:
 	vec3 u, v, w;				// Camera frame basis vectors
 	vec3 defocus_disk_u;		// Defocus disk horizontal radius
 	vec3 defocus_disk_v;		// Defocus disk vertical radius
-	std::vector<std::vector<color>> color_buffer; // Color buffer for parallelization
+	std::vector<color> color_buffer; // Color buffer for parallelization
 
 	void initialize()
 	{
 		/* Ensure height and width are >= 1, and initialize color buffer with dimensions */
 		image_width = (image_width < 1) ? 1 : image_width;
 		image_height = (image_height < 1) ? 1 : image_height;
-		color_buffer = std::vector<std::vector<color>>(image_width, std::vector<color>(image_height, color(0, 0, 0)));
+        color_buffer = std::vector<color>(image_height * image_width, color(0, 0, 0));
 
 		/* Predivide ratio for averaging, because iterated division is slow */
 		pixel_samples_scale = 1.0 / samples_per_pixel;
@@ -129,13 +131,13 @@ private:
 	/* Shades a pixel in a pixel buffer */
 	void shade_pixel(int i, int j, const hittable& scene)
 	{
-		color_buffer[i][j] = color(0, 0, 0);
+		//color_buffer[i * width + j] = color(0, 0, 0);
 		for (int sample = 0; sample < samples_per_pixel; sample++)
 		{
 			ray r = get_ray(i, j);
-			color_buffer[i][j] += ray_color(r, max_depth, scene);
+			color_buffer[i * image_width + j] += ray_color(r, max_depth, scene);
 		}
-		color_buffer[i][j] = pixel_samples_scale * color_buffer[i][j];
+		color_buffer[i * image_width + j] = pixel_samples_scale * color_buffer[i * image_width + j];
 	}
 
 	// Returns the vector to a random point in the [-.5,-.5],[+.5,+.5] unit square
