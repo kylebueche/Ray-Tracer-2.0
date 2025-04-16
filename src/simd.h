@@ -146,6 +146,53 @@ inline void SSE_len3_128(float *x, float *y, float *z, float *len, int length)
         _mm_store_ps(&len[i], v_len);
     }
 }
+
+// SSE Solve Quadratic
+// Behavior: solution_exists[i] = 0xFF if true, 0x00 if false.
+SSE_solve_quadratic_128(float *a, float *b, float *c, int *solution_exists, float *t0, float *t1, float epsilon, int length)
+{
+    // One-time loading
+    __m128 v_epsilon = _mm_load_ps1(&epsilon);
+    __m128 v_one = _mm_set_ps1(1.0f);
+    __m128 v_zero = _mm_setzero_ps();
+    __m128 v_negative_one_half = _mm_set_ps1(-0.5f);
+    __m128 v_a, v_b, v_c, v_t0, v_t1, v_h, v_inside_sqrt, v_solution_exists, v_mask, v_sqrt, v_t0_temp, v_t1_temp;
+    for (int i = 0; i < length; i = i + NUM_FLOATS_IN_128)
+    {
+        // Loading values
+        v_a = _mm_load_ps(&a[i]);
+        v_b = _mm_load_ps(&b[i]);
+        v_c = _mm_load_ps(&c[i]);
+
+        // Computations
+        v_one_over_a = _mm_div_ps(v_one, v_a);
+        v_h = _mm_mul_ps(v_b, v_negative_one_half);
+        v_inside_sqrt = _mm_sub_ps(_mm_mul_ps(v_h, v_h), _mm_mul_ps(v_a, v_c));
+        
+        // Mask sqrts, store boolean values for solution existence, ensure sqrts >= 0
+        v_solution_exists = _mm_cmpge_ps(v_inside_sqrt, v_zero);
+        v_inside_sqrt = _mm_mul_ps(v_solution_exists, v_inside_sqrt);
+        v_sqrt = _mm_sqrt_ps(v_inside_sqrt);
+
+        // Calculate solutions, t0 can potentially be greater than t1, depending on the sign of a
+        v_t0_temp = _mm_sub_ps(h, v_sqrt);
+        v_t0_temp = _mm_mul_ps(v_t0_temp, v_one_over_a);
+        v_t1_temp = _mm_add_ps(h, v_sqrt);
+        v_t1_temp = _mm_mul_ps(v_t1_temp, v_one_over_a);
+
+        // When t0 > t1, swap them using a bitmask.
+        // The mask will be all 0s or all 1s for each slot, so boolean float logic should be safe
+        v_mask = _mm_cmpgt_ps(v_t0, v_t1);
+        v_t0 = _mm_or_ps(_mm_andnot_ps(mask, v_t0_temp), _mm_and_ps(mask, v_t1_temp));
+        v_t1 = _mm_or_ps(_mm_andnot_ps(mask, v_t1_temp), _mm_and_ps(mask, v_t0_temp));
+        
+        // Storing values
+        // How to store solution exists? bitmask is 32 bits of 1 if true, 32 bits of 0 if false
+        solution_exists, v_solution_exists);
+        _mm_store_ps(&t0[i], v_t0);
+        _mm_store_ps(&t1[i], v_t1);
+    }
+}
 // SSE + FMA Dot Product 3D
 // Behavior: dot[i] = x1[i]*x2[i] + y1[i]*y2[i] + z1[i]*z2[i]
 inline void SSE_FMA_dot3_128(float *x1, float *y1, float *z1, float *x2, float *y2, float *z2, float *dot, int length)
@@ -201,78 +248,6 @@ inline void SSE_FMA_len3_128(float *x, float *y, float *z, float *len, int lengt
     }
 }
 
-/* Solves the quadratic equation for t given an a, b, and c, returns the first hit in the ray's bounds*/
-SSE_solve_quadratic_128(float *a, float *b, float *c, float *solution_exists, float *t0, float *t1, float epsilon, int length)
-{
-    float negative_one_half = 0.5f;
-    float one = 1.0f;
-    __m128 v_negative_one_half = _mm_load_ps1(&negative_one_half);
-    __m128 v_epsilon = _mm_load_ps1(&epsilon);
-    __m128 v_one = _mm_load_ps1(&one);
-    __m128 v_zero = _mm_setzero_ps();
-    __m128 v_a, v_b, v_c, v_t0, v_t1, v_h, v_inside_sqrt, v_mask, v_inverted_mask, v_sqrt, v_temp;
-    for (int i = 0; i < length; i = i + NUM_FLOATS_IN_128)
-    {
-        v_a = _mm_load_ps(&a[i]);
-        v_b = _mm_load_ps(&b[i]);
-        v_c = _mm_load_ps(&c[i]);
-
-        v_one_over_a = _mm_div_ps(v_one, v_a);
-        v_h = _mm_mul_ps(v_b, v_negative_one_half);
-        v_inside_sqrt = _mm_sub_ps(_mm_mul_ps(v_h, v_h), _mm_mul_ps(v_a, v_c));
-        
-        // Mask sqrts, store boolean values for solution existence, ensure sqrts >= 0
-        v_mask = _mm_cmpge_ps(v_inside_sqrt, v_zero);
-        v_inside_sqrt = _mm_mul_ps(v_mask, v_inside_sqrt);
-        v_sqrt = _mm_sqrt_ps(v_inside_sqrt);
-        _mm_store_ps(solution_exists, v_mask);
-
-        // Calculate solutions, t0 can potentially be greater than t1, depending on the sign of a
-        v_t0 = _mm_sub_ps(h, v_sqrt);
-        v_t0 = _mm_mul_ps(v_t0, v_one_over_a);
-        v_t1 = _mm_add_ps(h, v_sqrt);
-        v_t1 = _mm_mul_ps(v_t1, v_one_over_a);
-
-        // Whether or not a solution exists, 0 for false
-        // Reuse mask for figuring out which solution is the sooner one
-        // Is this lossy?
-        v_mask = _mm_cmplt_ps(v_t0, v_t1);
-        v_inverted_mask = 
-        v_temp = _mm_mul_ps(v_mask, v_t0);
-        v_temp = _mm_add_ps(_mm_mul_ps(
-// bro i give up im so tiredddddd
-
-
-	auto h = -0.5 * b; // Simplifies the quadratic equation with substitution
-	auto inside_sqrt = h * h - a * c;
-
-	// No intersection OR infinite intersection
-	if (inside_sqrt < 0.0 || (a < epsilon && a > -epsilon))
-	{
-		return false;
-	}
-
-	auto sqrtd = std::sqrt(inside_sqrt);
-
-	// Ensure t0 is the closer intersection. If the denominator is negative, this will happen
-	double t0 = (h - sqrtd) / a;
-	double t1 = (h + sqrtd) / a;
-	if (t0 > t1) std::swap(t0, t1);
-
-	// Find the nearest root in our range.
-	auto t = t0;
-	if (!ray_bounds.surrounds(t))
-	{
-		t = t1;
-		if (!ray_bounds.surrounds(t))
-		{
-			return false;
-		}
-	}
-	record.t = t;
-	record.p = ray.at(t);
-	return true;
-}
 
 // Double Precision Float SIMD:
 
