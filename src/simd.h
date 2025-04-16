@@ -21,97 +21,228 @@
 #include <immintrin.h>
 
 // Number of each item that fits into 128 byte SIMD registers
-#define NUM_BYTES_IN_128 16;
-#define NUM_FLOATS_IN_128 4;
-#define NUM_DOUBLES_IN_128 2;
-#define NUM_INTS8_IN_128 16;
-#define NUM_INTS16_IN_128 8;
-#define NUM_INTS32_IN_128 4;
-#define NUM_INTS64_IN_128 2;
+constexpr int NUM_BYTES_IN_128 128 / 8;
+constexpr int NUM_FLOATS_IN_128 128 / 32;
+constexpr int NUM_DOUBLES_IN_128 128 / 64;
+constexpr int NUM_INTS8_IN_128 128 / 8;
+constexpr int NUM_INTS16_IN_128 128 / 16;
+constexpr int NUM_INTS32_IN_128 128 / 32;
+constexpr int NUM_INTS64_IN_128 128 / 64;
 
 // Number of each item that fits into 256 byte SIMD registers
-#define NUM_BYTES_IN_256 32;
-#define NUM_FLOATS_IN_256 8;
-#define NUM_DOUBLES_IN_256 4;
-#define NUM_INTS8_IN_256 32;
-#define NUM_INTS16_IN_256 16;
-#define NUM_INTS32_IN_256 8;
-#define NUM_INTS64_IN_256 4;
+constexpr int NUM_BYTES_IN_256 256 / 8;
+constexpr int NUM_FLOATS_IN_256 256 / 32;
+constexpr int NUM_DOUBLES_IN_256 256 / 64;
+constexpr int NUM_INTS8_IN_256 256 / 8;
+constexpr int NUM_INTS16_IN_256 256 / 16;
+constexpr int NUM_INTS32_IN_256 256 / 32;
+constexpr int NUM_INTS64_IN_256 256 / 64;
+
+// Number of each item that fits into 512 byte SIMD registers
+constexpr int NUM_BYTES_IN_512 512 / 8;
+constexpr int NUM_FLOATS_IN_512 512 / 32;
+constexpr int NUM_DOUBLES_IN_512 512 / 64;
+constexpr int NUM_INTS8_IN_512 512 / 8;
+constexpr int NUM_INTS16_IN_512 512 / 16;
+constexpr int NUM_INTS32_IN_512 512 / 32;
+constexpr int NUM_INTS64_IN_512 512 / 64;
+
+
+/********************************************************
+ * SSE only instructions
+ * 
+ * All arrays must be 16-byte aligned.
+ * 
+ * length is the number of float elements in the array,
+ * which must be a multiple of 16 bytes
+ ********************************************************/
 
 /*********************************************************************
  * Single Precision Float Array SIMD 128:
  * 
  * Operates on four 32-bit floats at a time per input array.
- * Arrays must be 16-byte aligned, or 128 bits contiguous.
- * 
+ *
  * ******************************************************************/
 
-// SIMD Add
+// SSE Add
 // Behavior: out[i] = in1[i] + in2[i]
-inline void simd_add_128(float *in1, float *in2, float *out, size_t offset)
+inline void SSE_add_128(float *in1, float *in2, float *out, int length)
 {
-    __m128 v_in1 = _mm_load_ps(&in1[offset]);
-    __m128 v_in2 = _mm_load_ps(&in2[offset]);
-    __m128 v_out = _mm_add_ps(v_in1, v_in2);
-    _mm_store_ps(&out[offset], v_out);
+    __m128 v_in1, v_in2, v_out;
+    for (int i = 0; i < length; i += NUM_FLOATS_IN_128)
+    {
+        v_in1 = _mm_load_ps(&in1[i]);
+        v_in2 = _mm_load_ps(&in2[i]);
+        v_out = _mm_add_ps(v_in1, v_in2);
+        _mm_store_ps(&out[i], v_out);
+    }
 }
 
-// SIMD Multiply
+// SSE Multiply
 // Behavior: out[i] = in1[i] * in2[i]
-inline void simd_mul_128(float *in1, float *in2, float *out, size_t offset)
+inline void SSE_mul_128(float *in1, float *in2, float *out, int length)
 {
-    __m128 v_in1 = _mm_load_ps(&in1[offset]);
-    __m128 v_in2 = _mm_load_ps(&in2[offset]);
-    __m128 v_out = _mm_add_ps(v_in1, v_in2);
-    _mm_store_ps(&out[offset], v_out);
+    __m128 v_in1, v_in2, v_out;
+    for (int i = 0; i < length; i = i + NUM_FLOATS_IN_128)
+    {
+        __m128 v_in1 = _mm_load_ps(&in1[i]);
+        __m128 v_in2 = _mm_load_ps(&in2[i]);
+        __m128 v_out = _mm_add_ps(v_in1, v_in2);
+        _mm_store_ps(&out[i], v_out);
+    }
 }
 
-// SIMD Dot Product 3D
+// SSE Dot Product 3D
 // Behavior: dot[i] = x1[i]*x2[i] + y1[i]*y2[i] + z1[i]*z2[i]
-inline void simd_dot3_128(float *x1, float *y1, float *z1, float *x2, float *y2, float *z2, float *dot, size_t offset)
+inline void SSE_dot3_128(float *x1, float *y1, float *z1, float *x2, float *y2, float *z2, float *dot, int length)
 {
-    __m128 v_x1 = _mm_load_ps(&x1[offset]);
-    __m128 v_x2 = _mm_load_ps(&x2[offset]);
-    __m128 v_y1 = _mm_load_ps(&y1[offset]);
-    __m128 v_y2 = _mm_load_ps(&y2[offset]);
-    __m128 v_z1 = _mm_load_ps(&z1[offset]);
-    __m128 v_z2 = _mm_load_ps(&z2[offset]);
-    __m128 v_dot = _mm_mul_ps(v_x1, v_x2)
-    v_dot = _mm_fmadd_ps(v_y1, v_y2, v_dot);
-    v_dot = _mm_fmadd_ps(v_z1, v_z2, v_dot);
-    _mm_store_ps(&dot[offset], v_dot);
+    __m128 v_x1, v_x2, v_y1, v_y2, v_z1, v_z2, v_dot;
+    for (int i = 0; i < length; i = i + NUM_FLOATS_IN_128)
+    {
+        v_x1 = _mm_load_ps(&x1[i]);
+        v_x2 = _mm_load_ps(&x2[i]);
+        v_y1 = _mm_load_ps(&y1[i]);
+        v_y2 = _mm_load_ps(&y2[i]);
+        v_z1 = _mm_load_ps(&z1[i]);
+        v_z2 = _mm_load_ps(&z2[i]);
+        v_dot = _mm_mul_ps(v_x1, v_x2)
+        v_dot = _mm_add_ps(_mm_mul_ps(v_y1, v_y2), v_dot);
+        v_dot = _mm_add_ps(_mm_mul_ps(v_z1, v_z2), v_dot);
+        _mm_store_ps(&dot[i], v_dot);
+    }
 }
 
-// SIMD Length Squared 3D
+// SSE Length Squared 3D
 // Behavior: lensq[i] = x[i]^2 + y[i]^2 + z[i]^2
-inline void simd_lensq3_128(float *x, float *y, float *z, float *lensq, size_t offset)
+inline void SSE_lensq3_128(float *x, float *y, float *z, float *lensq, int length)
 {
-    __m128 v_x = _mm_load_ps(&x[offset]);
-    __m128 v_y = _mm_load_ps(&y[offset]);
-    __m128 v_z = _mm_load_ps(&z[offset]);
-    __m128 v_lensq = _mm_mul_ps(v_x, v_x)
-    v_lensq = _mm_fmadd_ps(v_y, v_y, v_lensq);
-    v_lensq = _mm_fmadd_ps(v_z, v_z, v_lensq);
-    _mm_store_ps(&lensq[offset], v_lensq);
+    __m128 v_x, v_y, v_z, v_lensq;
+    for (int i = 0; i < length; i = i + NUM_FLOATS_IN_128)
+    {
+        v_x = _mm_load_ps(&x[i]);
+        v_y = _mm_load_ps(&y[i]);
+        v_z = _mm_load_ps(&z[i]);
+        v_lensq = _mm_mul_ps(v_x, v_x)
+        v_lensq = _mm_add_ps(_mm_mul_ps(v_y, v_y), v_lensq);
+        v_lensq = _mm_add_ps(_mm_mul_ps(v_z, v_z), v_lensq);
+        _mm_store_ps(&lensq[i], v_lensq);
+    }
 }
 
-// SIMD Length 3D
+// SSE Length 3D
 // Behavior: len[i] = sqrt(x[i]^2 + y[i]^2 + z[i]^2)
-inline void simd_len3_128(float *x, float *y, float *z, float *len, size_t offset)
+inline void SSE_len3_128(float *x, float *y, float *z, float *len, int length)
 {
-    __m128 v_x = _mm_load_ps(&x[offset]);
-    __m128 v_y = _mm_load_ps(&y[offset]);
-    __m128 v_z = _mm_load_ps(&z[offset]);
-    __m128 v_lensq = _mm_mul_ps(v_x, v_x)
-    v_len = _mm_fmadd_ps(v_y, v_y, v_len);
-    v_len = _mm_fmadd_ps(v_z, v_z, v_len);
-    v_len = _mm_sqrt_ps(v_len);
-    _mm_store_ps(&len[offset], v_len);
+    v_x, v_y, v_z, v_len;
+    for (int i = 0; i < length; i = i + NUM_FLOATS_IN_128)
+    {
+        v_x = _mm_load_ps(&x[i]);
+        v_y = _mm_load_ps(&y[i]);
+        v_z = _mm_load_ps(&z[i]);
+        v_len = _mm_mul_ps(v_x, v_x)
+        v_len = _mm_add_ps(_mm_mul_ps(v_y, v_y), v_len);
+        v_len = _mm_add_ps(_mm_mul_ps(v_z, v_z), v_len);
+        v_len = _mm_sqrt_ps(v_len);
+        _mm_store_ps(&len[i], v_len);
+    }
+}
+// SSE + FMA Dot Product 3D
+// Behavior: dot[i] = x1[i]*x2[i] + y1[i]*y2[i] + z1[i]*z2[i]
+inline void SSE_FMA_dot3_128(float *x1, float *y1, float *z1, float *x2, float *y2, float *z2, float *dot, int length)
+{
+    __m128 v_x1, v_x2, v_y1, v_y2, v_z1, v_z2, v_dot;
+    for (int i = 0; i < length; i = i + NUM_FLOATS_IN_128)
+    {
+        v_x1 = _mm_load_ps(&x1[i]);
+        v_x2 = _mm_load_ps(&x2[i]);
+        v_y1 = _mm_load_ps(&y1[i]);
+        v_y2 = _mm_load_ps(&y2[i]);
+        v_z1 = _mm_load_ps(&z1[i]);
+        v_z2 = _mm_load_ps(&z2[i]);
+        v_dot = _mm_mul_ps(v_x1, v_x2)
+        v_dot = _mm_fmadd_ps(v_y1, v_y2, v_dot);
+        v_dot = _mm_fmadd_ps(v_z1, v_z2, v_dot);
+        _mm_store_ps(&dot[i], v_dot);
+    }
+}
+
+// SSE + FMA Length Squared 3D
+// Behavior: lensq[i] = x[i]^2 + y[i]^2 + z[i]^2
+inline void SSE_FMA_lensq3_128(float *x, float *y, float *z, float *lensq, int length)
+{
+    __m128 v_x, v_y, v_z, v_lensq;
+    for (int i = 0; i < length; i = i + NUM_FLOATS_IN_128)
+    {
+        v_x = _mm_load_ps(&x[i]);
+        v_y = _mm_load_ps(&y[i]);
+        v_z = _mm_load_ps(&z[i]);
+        v_lensq = _mm_mul_ps(v_x, v_x)
+        v_lensq = _mm_fmadd_ps(v_y, v_y, v_lensq);
+        v_lensq = _mm_fmadd_ps(v_z, v_z, v_lensq);
+        _mm_store_ps(&lensq[i], v_lensq);
+    }
+}
+
+// SSE + FMA Length 3D
+// Behavior: len[i] = sqrt(x[i]^2 + y[i]^2 + z[i]^2)
+inline void SSE_FMA_len3_128(float *x, float *y, float *z, float *len, int length)
+{
+    v_x, v_y, v_z, v_len;
+    for (int i = 0; i < length; i = i + NUM_FLOATS_IN_128)
+    {
+        v_x = _mm_load_ps(&x[i]);
+        v_y = _mm_load_ps(&y[i]);
+        v_z = _mm_load_ps(&z[i]);
+        v_len = _mm_mul_ps(v_x, v_x)
+        v_len = _mm_fmadd_ps(v_y, v_y, v_len);
+        v_len = _mm_fmadd_ps(v_z, v_z, v_len);
+        v_len = _mm_sqrt_ps(v_len);
+        _mm_store_ps(&len[i], v_len);
+    }
 }
 
 /* Solves the quadratic equation for t given an a, b, and c, returns the first hit in the ray's bounds*/
-bool solve_quadratic(float *px, float *py, float *pz, float *px, float *py, float *pz, interval ray_bounds, hit_record& record, float *a, float *b, float *c)
+SSE_solve_quadratic_128(float *a, float *b, float *c, float *solution_exists, float *t0, float *t1, float epsilon, int length)
 {
+    float negative_one_half = 0.5f;
+    float one = 1.0f;
+    __m128 v_negative_one_half = _mm_load_ps1(&negative_one_half);
+    __m128 v_epsilon = _mm_load_ps1(&epsilon);
+    __m128 v_one = _mm_load_ps1(&one);
+    __m128 v_zero = _mm_setzero_ps();
+    __m128 v_a, v_b, v_c, v_t0, v_t1, v_h, v_inside_sqrt, v_mask, v_inverted_mask, v_sqrt, v_temp;
+    for (int i = 0; i < length; i = i + NUM_FLOATS_IN_128)
+    {
+        v_a = _mm_load_ps(&a[i]);
+        v_b = _mm_load_ps(&b[i]);
+        v_c = _mm_load_ps(&c[i]);
+
+        v_one_over_a = _mm_div_ps(v_one, v_a);
+        v_h = _mm_mul_ps(v_b, v_negative_one_half);
+        v_inside_sqrt = _mm_sub_ps(_mm_mul_ps(v_h, v_h), _mm_mul_ps(v_a, v_c));
+        
+        // Mask sqrts, store boolean values for solution existence, ensure sqrts >= 0
+        v_mask = _mm_cmpge_ps(v_inside_sqrt, v_zero);
+        v_inside_sqrt = _mm_mul_ps(v_mask, v_inside_sqrt);
+        v_sqrt = _mm_sqrt_ps(v_inside_sqrt);
+        _mm_store_ps(solution_exists, v_mask);
+
+        // Calculate solutions, t0 can potentially be greater than t1, depending on the sign of a
+        v_t0 = _mm_sub_ps(h, v_sqrt);
+        v_t0 = _mm_mul_ps(v_t0, v_one_over_a);
+        v_t1 = _mm_add_ps(h, v_sqrt);
+        v_t1 = _mm_mul_ps(v_t1, v_one_over_a);
+
+        // Whether or not a solution exists, 0 for false
+        // Reuse mask for figuring out which solution is the sooner one
+        // Is this lossy?
+        v_mask = _mm_cmplt_ps(v_t0, v_t1);
+        v_inverted_mask = 
+        v_temp = _mm_mul_ps(v_mask, v_t0);
+        v_temp = _mm_add_ps(_mm_mul_ps(
+// bro i give up im so tiredddddd
+
+
 	auto h = -0.5 * b; // Simplifies the quadratic equation with substitution
 	auto inside_sqrt = h * h - a * c;
 
