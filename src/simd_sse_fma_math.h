@@ -1,5 +1,5 @@
 /*******************************************************************************************
- * File: simd.h
+ * File: simd_math.h
  * Author: Kyle Bueche
  *
  * Library for doing long streams of the same operation, vectorized and sped up using SIMD
@@ -15,8 +15,8 @@
  *
  ******************************************************************************************/
 
-#ifndef SIMD_H
-#define SIMD_H
+#ifndef SIMD_MATH_H
+#define SIMD_MATH_H
 
 #include <immintrin.h>
 
