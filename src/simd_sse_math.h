@@ -46,184 +46,98 @@ constexpr int NUM_INTS64_IN_128 128 / 64;
  *
  * ******************************************************************/
 
-// Behavior: out[i] = in1[i] + in2[i]
-inline void add_128f(float *in1, float *in2, float *out, int length)
+// Functions with f(vec3, vec3) = vec3
+inline void vec3_add_128f(__m128& v_x1 __m128& v_y1 __m128& v_z1, __m128& v_x2, __m128& v_y2, __m128& z2, __m128& v_x, __m128& v_y, __m128& v_z);
+inline void vec3_sub_128f(__m128& v_x1 __m128& v_y1 __m128& v_z1, __m128& v_x2, __m128& v_y2, __m128& z2, __m128& v_x, __m128& v_y, __m128& v_z);
+inline void vec3_cross_128f(__m128& v_x1 __m128& v_y1 __m128& v_z1, __m128& v_x2, __m128& v_y2, __m128& z2, __m128& v_x, __m128& v_y, __m128& v_z);
+
+// Functions with f(col3, col3) = col3
+inline void col3_add_128f(__m128& v_r1 __m128& v_g1 __m128& v_b1, __m128& v_r2, __m128& v_g2, __m128& b2, __m128& v_r, __m128& v_g, __m128& v_b);
+inline void col3_absorb_128f(__m128& v_r1 __m128& v_g1 __m128& v_b1, __m128& v_r2, __m128& v_g2, __m128& b2, __m128& v_r, __m128& v_g, __m128& v_b);
+
+// Functions with f(t, vec3) = vec3
+inline void vec3_scale_128f(__m128& v_scalar, __m128& v_x, __m128& v_y, __m128& v_z);
+
+// Functions with f(vec3, vec3) = t
+inline void vec3_dot_128f(__m128& v_x1 __m128& v_y1 __m128& v_z1, __m128& v_x2, __m128& v_y2, __m128& z2, __m128& v_t);
+
+// Functions with f(vec3) = t
+inline void vec3_len_128f(__m128& v_x __m128& v_y __m128& v_z, __m128& v_t);
+inline void vec3_len_squared_128f(__m128& v_x __m128& v_y __m128& v_z, __m128& v_t);
+
+// Vector functions
+inline void vec3_add_128f(__m128 v_x1 __m128 v_y1 __m128 v_z1, __m128 v_x2, __m128 v_y2, __m128 z2, __m128& v_x, __m128& v_y, __m128& v_z)
 {
-    __m128 v_in1, v_in2, v_out;
-    for (int i = 0; i < length; i += NUM_FLOATS_IN_128)
-    {
-        v_in1 = _mm_load_ps(&in1[i]);
-        v_in2 = _mm_load_ps(&in2[i]);
-        v_out = _mm_add_ps(v_in1, v_in2);
-        _mm_store_ps(&out[i], v_out);
-    }
+    v_x = _mm_add_ps(v_x1, v_x2);
+    v_y = _mm_add_ps(v_y1, v_y2);
+    v_z = _mm_add_ps(v_z1, v_z2);
 }
 
-// Behavior: out[i] = in1[i] - in2[i]
-inline void sub_128f(float *in1, float *in2, float *out, int length)
+inline void vec3_sub_128f(__m128 v_x1 __m128 v_y1 __m128 v_z1, __m128 v_x2, __m128 v_y2, __m128 z2, __m128& v_x, __m128& v_y, __m128& v_z)
 {
-    __m128 v_in1, v_in2, v_out;
-    for (int i = 0; i < length; i += NUM_FLOATS_IN_128)
-    {
-        v_in1 = _mm_load_ps(&in1[i]);
-        v_in2 = _mm_load_ps(&in2[i]);
-        v_out = _mm_sub_ps(v_in1, v_in2);
-        _mm_store_ps(&out[i], v_out);
-    }
+    v_x = _mm_sub_ps(v_x1, v_x2);
+    v_y = _mm_sub_ps(v_y1, v_y2);
+    v_z = _mm_sub_ps(v_z1, v_z2);
 }
 
-// Behavior: out[i] = in1[i] * in2[i]
-inline void mul_128f(float *in1, float *in2, float *out, int length)
+inline void vec3_scale_128f(__m128& v_scalar, __m128& v_x, __m128& v_y, __m128& v_z)
 {
-    __m128 v_in1, v_in2, v_out;
-    for (int i = 0; i < length; i = i + NUM_FLOATS_IN_128)
-    {
-        __m128 v_in1 = _mm_load_ps(&in1[i]);
-        __m128 v_in2 = _mm_load_ps(&in2[i]);
-        __m128 v_out = _mm_add_ps(v_in1, v_in2);
-        _mm_store_ps(&out[i], v_out);
-    }
+    v_x = _mm_mul_ps(v_scalar, v_x);
+    v_y = _mm_mul_ps(v_scalar, v_y);
+    v_z = _mm_mul_ps(v_scalar, v_z);
 }
 
-// Vec3 Add. Behavior: (x, y, z) = (x1, y1, z1) + (x2, y2, z2)
-inline void vec3_add_128f(float *x1, float *y1, float *z1, float *x2, float *y2, float *z2, float *x, float *y, float *z)
+inline void vec3_dot_128f(__m128& v_x1 __m128& v_y1 __m128& v_z1, __m128& v_x2, __m128& v_y2, __m128& z2, __m128& v_dot);
 {
-    add_128f(x1, x2, x);
-    add_128f(y1, y2, y);
-    add_128f(z1, z2, z);
+    v_dot = _mm_mul_ps(v_x1, v_x2);
+    v_dot = _mm_add_ps(v_t, _mm_mul_ps(v_y1, v_y2));
+    v_dot = _mm_add_ps(v_t, _mm_mul_ps(v_z1, v_z2));
 }
 
-// Vec3 Sub. Behavior: (x, y, z) = (x1, y1, z1) - (x2, y2, z2)
-inline void vec3_sub_128f(float *x1, float *y1, float *z1, float *x2, float *y2, float *z2, float *x, float *y, float *z)
+inline void vec3_cross_128f(__m128 v_x1 __m128 v_y1 __m128 v_z1, __m128 v_x2, __m128 v_y2, __m128 z2, __m128& v_x, __m128& v_y, __m128& v_z)
 {
-    sub_128f(x1, x2, x);
-    sub_128f(y1, y2, y);
-    sub_128f(z1, z2, z);
+    v_x = _mm_sub_ps(_mm_mul_ps(v_y1, v_z2), _mm_mul_ps(v_z1, v_y2));
+    v_y = _mm_sub_ps(_mm_mul_ps(v_z1, v_x2), _mm_mul_ps(v_x1, v_z2));
+    v_z = _mm_sub_ps(_mm_mul_ps(v_x1, v_y2), _mm_mul_ps(v_y1, v_x2));
 }
 
-// Vec3 Mul. Behavior: (x, y, z) = (x1 * x2, y1 * y2, z1 * z2) <- (x1, y1, z1), (x2, y2, z2)
-inline void vec3_mul_128f(float *x1, float *y1, float *z1, float *x2, float *y2, float *z2, float *x, float *y, float *z)
+inline void vec3_len_squared_128f(__m128& v_x __m128& v_y __m128& v_z, __m128& v_len_squared);
 {
-    mul_128f(x1, x2, x);
-    mul_128f(y1, y2, y);
-    mul_128f(z1, z2, z);
+    v_len_squared = _mm_mul_ps(v_x, v_x);
+    v_len_squared = _mm_add_ps(v_len_squared, _mm_mul_ps(v_y, v_y));
+    v_len_squared = _mm_add_ps(v_len_squared, _mm_mul_ps(v_z, v_z));
 }
 
-// Avg. Behavior: out[i] = sum(values[a][i]) / num_samples, for all a from [0, num_samples)
-inline void avg_128f(float **values, float *avg, int num_samples, int throughput)
+inline void vec3_len_128f(__m128& v_x __m128& v_y __m128& v_z, __m128& v_len);
 {
-    float scalar = 1.0f / num_samples
-    __m128 v_value, v_avg;
-    __m128 v_scalar = _mm_load_ps1(scalar);
-    for (int i = 0; i < throughput; i += NUM_FLOATS_IN_128)
-    {
-        v_avg = _mm_load_ps1(0.0f);
-        for (int a = 0; i < num_samples; i++)
-        {
-            v_value = _mm_load_ps(&(values[a])[i]);
-            v_avg = _mm_add_ps(v_value, v_avg);
-        }
-        v_avg = _mm_mul_ps(v_scalar, v_avg);
-        _mm_store_ps(avg, v_avg);
-    }
+    v_len = _mm_mul_ps(v_x, v_x);
+    v_len = _mm_add_ps(v_len, _mm_mul_ps(v_y, v_y));
+    v_len = _mm_add_ps(v_len, _mm_mul_ps(v_z, v_z));
+    v_len = _mm_sqrt_ps(v_len);
 }
 
-// Dot Product 3D. Behavior: dot[i] = x1[i]*x2[i] + y1[i]*y2[i] + z1[i]*z2[i]
-inline void vec3_dot_128f(float *x1, float *y1, float *z1, float *x2, float *y2, float *z2, float *dot, int length)
-{
-    __m128 v_x1, v_x2, v_y1, v_y2, v_z1, v_z2, v_dot;
-    for (int i = 0; i < length; i = i + NUM_FLOATS_IN_128)
-    {
-        v_x1 = _mm_load_ps(&x1[i]);
-        v_x2 = _mm_load_ps(&x2[i]);
-        v_y1 = _mm_load_ps(&y1[i]);
-        v_y2 = _mm_load_ps(&y2[i]);
-        v_z1 = _mm_load_ps(&z1[i]);
-        v_z2 = _mm_load_ps(&z2[i]);
-        v_dot = _mm_mul_ps(v_x1, v_x2)
-        v_dot = _mm_add_ps(_mm_mul_ps(v_y1, v_y2), v_dot);
-        v_dot = _mm_add_ps(_mm_mul_ps(v_z1, v_z2), v_dot);
-        _mm_store_ps(&dot[i], v_dot);
-    }
-}
-
-// Length Squared 3D. Behavior: lensq[i] = x[i]^2 + y[i]^2 + z[i]^2
-inline void vec3_lensq_128f(float *x, float *y, float *z, float *lensq, int length)
-{
-    __m128 v_x, v_y, v_z, v_lensq;
-    for (int i = 0; i < length; i = i + NUM_FLOATS_IN_128)
-    {
-        v_x = _mm_load_ps(&x[i]);
-        v_y = _mm_load_ps(&y[i]);
-        v_z = _mm_load_ps(&z[i]);
-        v_lensq = _mm_mul_ps(v_x, v_x)
-        v_lensq = _mm_add_ps(_mm_mul_ps(v_y, v_y), v_lensq);
-        v_lensq = _mm_add_ps(_mm_mul_ps(v_z, v_z), v_lensq);
-        _mm_store_ps(&lensq[i], v_lensq);
-    }
-}
-
-// Length 3D. Behavior: len[i] = sqrt(x[i]^2 + y[i]^2 + z[i]^2)
-inline void vec3_len_128f(float *x, float *y, float *z, float *len, int length)
-{
-    v_x, v_y, v_z, v_len;
-    for (int i = 0; i < length; i = i + NUM_FLOATS_IN_128)
-    {
-        v_x = _mm_load_ps(&x[i]);
-        v_y = _mm_load_ps(&y[i]);
-        v_z = _mm_load_ps(&z[i]);
-        v_len = _mm_mul_ps(v_x, v_x)
-        v_len = _mm_add_ps(_mm_mul_ps(v_y, v_y), v_len);
-        v_len = _mm_add_ps(_mm_mul_ps(v_z, v_z), v_len);
-        v_len = _mm_sqrt_ps(v_len);
-        _mm_store_ps(&len[i], v_len);
-    }
-}
-
-// Solve Quadratic. Behavior: solution_exists[i] = 0xFF if true, 0x00 if false. t0[i] < t1[i] if 2 solutions, t[0] == t[1] if 1 solution.
-solve_quadratic_128f(float *a, float *b, float *c, int *solution_exists, float *t0, float *t1, float epsilon, int length)
+solve_quadratic_128f(__m128& v_a, __m128& v_b, __m128& v_c, __m128& v_solution_exists, __m128& v_t0, __m128& v_t1)
 {
     // One-time loading
-    __m128 v_epsilon = _mm_load_ps1(&epsilon);
     __m128 v_one = _mm_set_ps1(1.0f);
     __m128 v_zero = _mm_setzero_ps();
     __m128 v_negative_one_half = _mm_set_ps1(-0.5f);
-    __m128 v_a, v_b, v_c, v_t0, v_t1, v_h, v_inside_sqrt, v_solution_exists, v_mask, v_sqrt, v_t0_temp, v_t1_temp;
-    for (int i = 0; i < length; i = i + NUM_FLOATS_IN_128)
-    {
-        // Loading values
-        v_a = _mm_load_ps(&a[i]);
-        v_b = _mm_load_ps(&b[i]);
-        v_c = _mm_load_ps(&c[i]);
-
-        // Computations
-        v_one_over_a = _mm_div_ps(v_one, v_a);
-        v_h = _mm_mul_ps(v_b, v_negative_one_half);
-        v_inside_sqrt = _mm_sub_ps(_mm_mul_ps(v_h, v_h), _mm_mul_ps(v_a, v_c));
+    __m128 v_a, v_b, v_c, v_h, v_inside_sqrt, v_solution_exists, v_mask, v_sqrt;
+    // Computations
+    v_one_over_a = _mm_div_ps(v_one, v_a);
+    v_h = _mm_mul_ps(v_b, v_negative_one_half);
+    v_inside_sqrt = _mm_sub_ps(_mm_mul_ps(v_h, v_h), _mm_mul_ps(v_a, v_c));
         
-        // Mask sqrts, store boolean values for solution existence, ensure sqrts >= 0
-        v_solution_exists = _mm_cmpge_ps(v_inside_sqrt, v_zero);
-        v_inside_sqrt = _mm_mul_ps(v_solution_exists, v_inside_sqrt);
-        v_sqrt = _mm_sqrt_ps(v_inside_sqrt);
+    // Mask sqrts, store boolean values for solution existence, ensure sqrts >= 0
+    v_solution_exists = _mm_cmpge_ps(v_inside_sqrt, v_zero);
+    v_inside_sqrt = _mm_and_ps(v_inside_sqrt, v_solution_exists); // Ensures det is zero if det is negative
+    v_sqrt = _mm_sqrt_ps(v_inside_sqrt);
 
-        // Calculate solutions, t0 can potentially be greater than t1, depending on the sign of a
-        v_t0_temp = _mm_sub_ps(h, v_sqrt);
-        v_t0_temp = _mm_mul_ps(v_t0_temp, v_one_over_a);
-        v_t1_temp = _mm_add_ps(h, v_sqrt);
-        v_t1_temp = _mm_mul_ps(v_t1_temp, v_one_over_a);
-
-        // When t0 > t1, swap them using a bitmask.
-        // The mask will be all 0s or all 1s for each slot, so boolean float logic should be safe
-        v_mask = _mm_cmpgt_ps(v_t0, v_t1);
-        v_t0 = _mm_or_ps(_mm_andnot_ps(mask, v_t0_temp), _mm_and_ps(mask, v_t1_temp));
-        v_t1 = _mm_or_ps(_mm_andnot_ps(mask, v_t1_temp), _mm_and_ps(mask, v_t0_temp));
-        
-        // Storing values
-        // How to store solution exists? bitmask is 32 bits of 1 if true, 32 bits of 0 if false
-        solution_exists, v_solution_exists);
-        _mm_store_ps(&t0[i], v_t0);
-        _mm_store_ps(&t1[i], v_t1);
-    }
+    // Calculate solutions, t0 can potentially be greater than t1, depending on the sign of a
+    v_t0_temp = _mm_sub_ps(h, v_sqrt);
+    v_t0_temp = _mm_mul_ps(v_t0_temp, v_one_over_a);
+    v_t1_temp = _mm_add_ps(h, v_sqrt);
+    v_t1_temp = _mm_mul_ps(v_t1_temp, v_one_over_a);
 }
 
 
