@@ -40,40 +40,7 @@ constexpr int NUM_INTS64_IN_128 128 / 64;
 // Random
 
 // Need a non zero seperate seed for each slot:
-class Rand128
-{
-    public:
-        Rand128()
-        {
-            state = _mm_set_epi32(0x12345678, 0x87654321, 0xabcdef12, 0x12fedcba);
-            mantissaShift = 32 - FLT_MANT_DIG;
-            expFactor = _mm_set_ps1(1.0f / (UINT32_C(1) << FLT_MANT_DIG))l
-        }
-        
-        __m128i nextInt()
-        {
-            xorshift();
-            return state;
-        }
 
-        __m128 nextFloat()
-        {
-            xorshift();
-            return _mm_mul_ps(_mm_castsi128_ps(_mm_srli_epi32(state, mantissaShift)), expFactor);
-        }
-        
-    private:
-        __m128i state;
-        __m128 expFactor;
-        int mantissaShift;
-
-        void xorshift()
-        {
-            state = _mm_xor_si128(state, _mm_slli_epi32(state, 13));
-            state = _mm_xor_si128(state, _mm_srli_epi32(state, 17));
-            state = _mm_xor_si128(state, _mm_slli_epi32(state, 5));
-        }
-}
 
 inline __m128i init_state_128i()
 {
