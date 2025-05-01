@@ -91,69 +91,47 @@ private:
 
     // Construct a camera ray originating from the defocus disk and directed at
     // a randomly sampled point around the pixel location i, j
-    ray get_ray() const
-    {
-        ray_pos_x = _mm_mul_128(
-    }
 
     // Shades multiple pixels in simd lockstep
-    void simd_render(const hittable& scene)
+    void simd_render_128f(const hittable& scene)
     {
-        for (int sample = 0; sample < samples_per_pixel; sample++)
-        {
-            _m128 ray_pos_x;
-            _m128 ray_pos_y;
-            _m128 ray_pos_z;
-            _m128 ray_dir_x;
-            _m128 ray_dir_y;
-            _m128 ray_dir_z;
-            get_ray(ray_pos_x, ray_pos_y, ray_pos_z, ray_dir_x, ray_dir_y, ray_dir_z, i, j);
-            color_buffer[line * image_width + p] += ray_color(r, max_depth, scene);
-        }
-        color_buffer[line * image_width + p] = pixel_samples_scale * color_buffer[line * image_width + p];
-    }
-
-    // Returns the vector to a random point in the [-.5,-.5],[+.5,+.5] unit square
-    vec3 sample_square() const
-    {
-        return vec3(random_double() - 0.5, random_double() - 0.5, 0);
-    }
-
-    // Returns a random point in the camera defocus disk
-    vec3 defocus_disk_sample() const
-    {
-        auto p = random_in_unit_disk();
-        return center + (p[0] * defocus_disk_u) + (p[1] * defocus_disk_v);
-    }
-
-    color ray_color(const ray& r, int depth, const hittable& world)
-    {
-        // If we've exceeded the ray bounce limit, no more light is gathered
-        if (depth <= 0)
-            return color(0, 0, 0);
-
-        hit_record rec;
-
-        if (world.hit(r, interval(0.001, infinity), rec))
-        {
-            ray scattered;
-            color attenuation;
-            if (rec.mat->scatter(r, rec, attenuation, scattered))
-            {
-                // Dont bother recursion if the values will be 0 anyways
-                //if (attenuation.near_zero())
-                    //return attenuation;
-                // Otherwise, recursion time >:)
-                return attenuation * ray_color(scattered, depth - 1, world);
-            }
-            return color(0, 0, 0);
-        }
-
-        vec3 unit_direction = unit_vector(r.direction());
-        auto a = 0.5 * (unit_direction.y() + 1.0);
-        return ((1.0 - a) * color(1.0, 1.0, 1.0) + a * color(0.5, 0.7, 1.0));
-    }
-
+		
+		__m128 v_pixelWidth = _mm_load_ps1(pixelWidth);
+		__m128 v_pixelHeight = _mm_load_ps1(pixelHeight);
+		__m128 v_randState = _mm_load_ps1(;
+		sse_init_rand_state_128f(v_randState);
+		for (int p = 0; p < num_pixels; p = p + FLOATS_IN_128)
+		{
+			__m128 v_pixelX = _mm_load_ps(&pixelPosX[p]);
+  			__m128 v_pixelY = _mm_load_ps(&pixelPosY[p]);
+			for (int r = 0; r < num_rays; r = r++)
+			{
+				__m128 a;
+				__m128 rayPosX, rayPosY, rayPosZ, rayDirX, rayDirY, rayDirZ;
+				sse_sample_ray(v_randState, v_pixelX, v_pixelY, v_pixelWidth, v_pixelHeight, /* <- input, output -> */ rayPosX, rayPosY, rayPosZ, rayDirX, rayDirY, rayDirZ);
+				sse_lensq_128f(rayDirX, rayDirY, rayDirZ, /* <- input, output -> */ a);
+				for (int s = 0; s < num_spheres; o = o++)
+				{
+					// Advantageous to have AoS sphere objects here
+					__m128 radius = _mm_load_ps1(spheres[s].radius);
+					__m128 originToCenterX = _mm_sub_ps(_mm_load_ps1(spheres[s].x), rayPosX);
+					__m128 originToCenterY = _mm_sub_ps(_mm_load_ps1(spheres[s].y), rayPosY);
+					__m128 originToCenterZ = _mm_sub_ps(_mm_load_ps1(spheres[s].z), rayPosZ);
+					// Substitute -0.5 * b for h, skip some computation
+					__m128 h;
+					__m128 originToCenterLenSq;
+					sse_dot_128f(rayDirX, rayDirY, rayDirZ, originToCenterX, originToCenterY, originToCenterZ, /* <- input, output -> */ h);
+					sse_lensq_128f(originToCenterX, originToCenterX, originToCenterX, /* <- input, output -> */ originToCenterLenSq);
+					__m128 c = _mm_sub_128f(originToCenterLenSq, _mm_mul_ps(radius, radius));
+					__m128 t0, t1, solution_exists;
+					sse_solve_quadratic_128f(a, h, c, /* <- input, output -> */ solution_exists, t0, t1);
+					__m128 t = _mm_min_ps(t0, t1);
+					/* More logic here to track the closest object thus far, and do material and color stuff */
+					/* Sum the colors into the pixel whatever im tired of writing prototype code */
+				}
+			}
+		}
+        
     void write_png(char *filename)
     {
         std::vector<unsigned char> out = std::vector<unsigned char>(image_height * image_width * 3, 0);
@@ -177,48 +155,5 @@ private:
     }
 };
 
-class standard_camera : public camera
-{
-public:
-
-    double aspect_ratio = 1.0;
-    bool auto_height = false; // Whether or not to use aspect ratio to determine height
-
-    void render(const hittable& scene)
-    {
-        if (auto_height)
-            image_height = int(image_width / aspect_ratio);
-        camera::render(scene);
-    }
-
-    void set_dimensions(int width, int height)
-    {
-        auto_height = false;
-        image_width = width;
-        image_height = height;
-    }
-
-    /* 240p, 320x240, 4.0/3.0 */
-    void setLD() { set_dimensions(320, 240); }
-
-    /* 480p, 640x480, 4.0/3.0 */
-    void setSD() { set_dimensions(640, 480); }
-
-    /* 720p, 1280x720, 16.0/9.0 */
-    void setHD() { set_dimensions(1280, 720); }
-
-    /* 1080p, 1920x1080, 16.0/9.0 */
-    void setFHD() { set_dimensions(1920, 1080); }
-
-    /* 1440p, 2560x1440, 16.0/9.0 */
-    void setQHD() { set_dimensions(2560, 1440); }
-
-    /* 4K, 3840x2160, 16.0/9.0 */
-    void setUHD() { set_dimensions(3840, 2160); }
-
-    /* DCI 4K, 4096x2160 (Cinema Standard), 256.0/135.0 */
-    void setDCI4K() { set_dimensions(4096, 2160); }
-
-};
 
 #endif

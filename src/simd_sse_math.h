@@ -126,19 +126,26 @@ inline void vec3_len_squared_128f(const __m128& v_x, const __m128& v_y, const __
     v_len_squared = _mm_add_ps(v_len_squared, _mm_mul_ps(v_z, v_z));
 }
 
-inline void vec3_len_128f(const __m128& v_x, const __m128& v_y, const __m128& v_z, __m128& v_len);
+inline void vec3_len_128f(const __m128& x, const __m128& y, const __m128& z, __m128& len);
 {
-    v_len = _mm_mul_ps(v_x, v_x);
-    v_len = _mm_add_ps(v_len, _mm_mul_ps(v_y, v_y));
-    v_len = _mm_add_ps(v_len, _mm_mul_ps(v_z, v_z));
-    v_len = _mm_sqrt_ps(v_len);
+    len = _mm_mul_ps(x, x);
+    len = _mm_add_ps(len, _mm_mul_ps(y, y));
+    len = _mm_add_ps(len, _mm_mul_ps(z, z));
+    len = _mm_sqrt_ps(len);
 }
 
-inline void col3_scale_128f(const __m128& v_scalar, __m128& v_r, __m128& v_g, __m128& v_b)
+inline void col3_scale_128f(const __m128& scalar, __m128& r, __m128& g, __m128& b)
 {
-    v_r = _mm_mul_ps(v_scalar, v_r);
-    v_g = _mm_mul_ps(v_scalar, v_g);
-    v_b = _mm_mul_ps(v_scalar, v_b);
+    r = _mm_mul_ps(scalar, r);
+    g = _mm_mul_ps(scalar, g);
+    b = _mm_mul_ps(scalar, b);
+}
+
+inline void col3_add_128f(const __m128& r1, const __m128& g1, const __m128& b1, const __m128& r2, const __m128& g2, const __m128& b2, __m128& r, __m128& g, __m128& b)
+{
+    r = _mm_add_ps(r1, r2);
+    g = _mm_add_ps(g1, g2);
+    b = _mm_add_ps(b1, b2);
 }
 
 // This function is weird, but it's advantageous to load constants once rather than allocating each iteration
@@ -148,6 +155,9 @@ inline void col3_scale_128f(const __m128& v_scalar, __m128& v_r, __m128& v_g, __
 // __m128 v_neg_one_half = _mm_set_ps1(-0.5f);
 // outside of this function, and feed them into their respective slots if this optimization becomes worthwhile
 // Uses an h = -0.5b substitution to do less computation
+
+inline void init_quadratic_consts_128f(__m128& v_one, 
+
 inline void solve_quadratic_128f(const __m128& a, const __m128& b, const __m128& c, __m128& solution_exists, __m128& t0, __m128& t1)
 {
     // One-time loading
