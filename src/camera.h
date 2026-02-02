@@ -11,93 +11,89 @@
 
 class camera
 {
-  public:
-    int image_width = 100;
-    int image_height = 100;
+    public:
+        int imageWidth = 100;
+        int imageHeight = 100;
+        int samplesPerPixel = 10;
+        int maxDepth = 10; // recursive ray depth (max bounces)
+        float verticalFOV = 90; // Vertical view angle (field of view)
+        vec3 origin = vec3(10, 1, 0);
+        vec3 focalPoint = vec3(0, 0, 0);
+        vec3 upDirection = vec3(0, 1, 0);
+        float defocusAngle = 0; // Variation angle of rays through each pixel
 
-    int samples_per_pixel = 10;
-    int max_depth = 10; // recursive ray depth (max bounces)
-
-    double vfov = 90; // Vertical view angle (field of view)
-    point3 lookfrom = point3(0, 0, 0);
-    point3 lookat = point3(0, 0, -1);
-    vec3 vup = vec3(0, 1, 0);
-
-    double defocus_angle = 0; // Variation angle of rays through each pixel
-    double focus_dist = 10;   // Distance from camera lookfrom point to plane of perfect focus
-
-    // Render the image
-    void render(const hittable& scene)
-    {
-        initialize();
-        std::clog << "Computing...\n";
-        
-        // Dynamically paralellize rays in chunks of rows
-        #pragma omp parallel for shared(scene) schedule(dynamic)
-        for (int line = 0; line < image_height; line++)
+        // Render the image
+        void render(const hittable& scene)
         {
-            for (int p = 0; p < image_width; p++){
-                shade_pixel(line, p, scene);
-            }
-
-            if (omp_get_thread_num() == 0)
+            initialize();
+            std::clog << "Computing...\n";
+            // Dynamically paralellize rays in chunks of rows
+            #pragma omp parallel for shared(scene) schedule(dynamic)
+            for (int line = 0; line < image_height; line++)
+            {
+                for (int p = 0; p < image_width; p++){
+                    shade_pixel(line, p, scene);
+                }
+                if (omp_get_thread_num() == 0)
                 std::clog << "\rPercent complete: " << (int) (100.0 * line / image_height) << "%" << std::flush;    
+            }
+            std::clog << "\rPercent complete: " << "100%" << std::flush;
+            write_png((char *) "output/image.png");
+            std::clog << "\rDone.                 \n";
         }
-        std::clog << "\rPercent complete: " << "100%" << std::flush;
-        write_png((char *) "output/image.png");
-        std::clog << "\rDone.                 \n";
-    }
 
-private:
-    double pixel_samples_scale; // Color scale factor for a sum of pixel samples
-    point3 center;              // Camera center
-    point3 pixel00_loc;         // Location of pixel 0, 0
-    vec3 pixel_delta_u;         // Offset to pixel to the right
-    vec3 pixel_delta_v;         // Offset to pixel below
-    vec3 u, v, w;               // Camera frame basis vectors
-    vec3 defocus_disk_u;        // Defocus disk horizontal radius
-    vec3 defocus_disk_v;        // Defocus disk vertical radius
-    std::vector<color> color_buffer; // Color buffer for parallelization
+    private:
+        float pixelSampleScale; // Color scale factor for a sum of pixel samples
+        point3 pixelTopLeft;         // Location of pixel 0, 0
+        vec3 deltaU;         // Offset to pixel to the right
+        vec3 deltaV;         // Offset to pixel below
+        vec3 u, v, w;               // Camera frame basis vectors
+        vec3 defocus_disk_u;        // Defocus disk horizontal radius
+        vec3 defocus_disk_v;        // Defocus disk vertical radius
+        std::vector<color> color_buffer; // Color buffer for parallelization
 
-    void initialize()
-    {
-        /* Ensure height and width are >= 1, and initialize color buffer with dimensions */
-        image_width = (image_width < 1) ? 1 : image_width;
-        image_height = (image_height < 1) ? 1 : image_height;
-        color_buffer = std::vector<color>(image_height * image_width, color(0, 0, 0));
+        void initialize()
+        {
+            if (imageWidth < 1)
+            {
+                imageWidth = 1;
+            }
+            if (image_height < 1)
+            {
+                image_height = 1;
+            }
+            color_buffer = std::vector<color>(image_height * image_width, color(0, 0, 0));
 
-        /* Predivide ratio for averaging, because iterated division is slow */
-        pixel_samples_scale = 1.0 / samples_per_pixel;
-        center = lookfrom;
+            pixelSampleScale = 1.0 / samplesPerPixel;
 
-        /* Determine viewport dimensions */
-        auto theta = degrees_to_radians(vfov);
-        auto h = std::tan(theta / 2);
-        auto viewport_height = 2 * h * focus_dist;
-        auto viewport_width = viewport_height * (double(image_width) / image_height);
+            /* Determine viewport dimensions */
+            float theta = degrees_to_radians(vfov);
+            float h = std::tan(theta / 2);
+            float viewport_height = 2 * h * focus_dist;
+            float viewport_width = viewport_height * (float(image_width) / image_height);
 
-        // Calculate the u, v, w unit basis vectors for the camera coordinate frame.
-        w = unit_vector(lookfrom - lookat);
-        u = unit_vector(cross(vup, w));
-        v = cross(w, u);
+            // Calculate the u, v, w unit basis vectors for the camera coordinate frame.
+            w = unitVector(origin - focalPoint);
+            u = unitVector(vecCross(vup, w));
+            v = cross(w, u);
 
-        // Calculate the vectors across the horizontal and vertical delta vectors from pixel to pixel.
-        vec3 viewport_u = viewport_width * u;   // Vector across horizontal edge
-        vec3 viewport_v = viewport_height * -v; // Vector down vertical edge
+            // Calculate the vectors across the horizontal and vertical delta vectors from pixel to pixel.
+            vec3 viewport_u = viewport_width * u;   // Vector across horizontal edge
+            vec3 viewport_v = viewport_height * -v; // Vector down vertical edge
 
-        // Calculate the horizontal and vertical delta vectors from pixel to pixel.
-        pixel_delta_u = viewport_u / image_width;
-        pixel_delta_v = viewport_v / image_height;
+            // Calculate the horizontal and vertical delta vectors from pixel to pixel.
+            pixel_delta_u = viewport_u / image_width;
+            pixel_delta_v = viewport_v / image_height;
 
-        // Calculate location of upper left pixel
-        auto viewport_upper_left = center - focus_dist * w - viewport_u / 2 - viewport_v / 2;
-        pixel00_loc = viewport_upper_left + 0.5 * (pixel_delta_u + pixel_delta_v);
+            // Calculate location of upper left pixel
+            auto viewport_upper_left = center - focus_dist * w - viewport_u / 2 - viewport_v / 2;
+            pixel00_loc = viewport_upper_left + 0.5 * (pixel_delta_u + pixel_delta_v);
 
-        // Calculate the camera defocus disk basis vectors
-        auto defocus_radius = focus_dist * std::tan(degrees_to_radians(defocus_angle / 2));
-        defocus_disk_u = u * defocus_radius;
-        defocus_disk_v = v * defocus_radius;
-    }
+            // Calculate the camera defocus disk basis vectors
+            auto defocus_radius = focus_dist * std::tan(degrees_to_radians(defocus_angle / 2));
+            defocus_disk_u = u * defocus_radius;
+            defocus_disk_v = v * defocus_radius;
+        }
 
 
     // Construct a camera ray originating from the defocus disk and directed at
