@@ -1,3 +1,7 @@
+// Copyright (c) 2026 Kyle Bueche
+// SPDX-License-Identifier: MIT
+// Author: Kyle Bueche
+
 #ifndef HITTABLE_LIST_H
 #define HITTABLE_LIST_H
 

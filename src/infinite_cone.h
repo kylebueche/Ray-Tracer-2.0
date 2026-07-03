@@ -1,3 +1,7 @@
+// Copyright (c) 2026 Kyle Bueche
+// SPDX-License-Identifier: MIT
+// Author: Kyle Bueche
+
 #ifndef INFINITE_CONE_H
 #define INFINITE_CONE_H
 

@@ -1,11 +1,6 @@
-/************************************************************************
-* Author: The Nacho Guy
-* 
-* This code is intended to output high detail ray-traced image files in
-* a reasonably optimal amount of time, but will not attempt to ray-trace
-* in real time.
-* 
-*************************************************************************/
+// Copyright (c) 2026 Kyle Bueche
+// SPDX-License-Identifier: MIT
+// Author: Kyle Bueche
 
 #include "rtproject.h"
 
