@@ -48,7 +48,7 @@ class camera
                 std::clog << "\rPercent complete: " << (int) (100.0 * line / image_height) << "%" << std::flush;    
         }
         std::clog << "\rPercent complete: " << "100%" << std::flush;
-        write_png((char *) "output/image.png");
+        write_png((char *) "image.png");
         std::clog << "\rDone.                 \n";
     }
 
