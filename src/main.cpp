@@ -21,7 +21,8 @@ void csv_ray_distribution(int);
 
 int main()
 {
-	cone_scene();
+	//cone_scene();
+	intersection_geometry_scene();
 }
 
 void cone_scene()
@@ -138,9 +139,10 @@ void intersection_geometry_scene()
 	standard_camera cam;
 
 	cam.setLD();
+	cam.setDCI4K();
 
-	cam.samples_per_pixel = 100;
-	cam.max_depth = 15;
+	cam.samples_per_pixel = 40;
+	cam.max_depth = 10;
 
 	cam.vfov = 30;
 	cam.lookfrom = point3(20, 3, 20);

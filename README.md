@@ -1,2 +1,27 @@
-# Ray-Tracer-2.0
-My 2nd take on a ray tracer. Writing my last one in C was fun, but it taught me the value that C++ has to offer in this kind of project. Also, I'll now be following the "Ray Tracing in One Weekend" tutorial instead of braining it out.
+# C++ Ray Tracer
+
+This is a path tracer I wrote following the
+[Ray Tracing in One Weekend](https://raytracing.github.io/books/RayTracingInOneWeekend.html)
+book.
+
+<hr>
+
+### Supported Features:
+
+- Diffuse, Metallic, & Dielectric Materials
+- Spheres, Planes, Cones
+- Unions & Intersections
+- Depth of Field
+
+### Usage Guide:
+
+To run this code yourself, clone the repository, and open the CMake project (CMakeLists.txt) in your favorite C++ IDE. I used CLion.
+
+This project is for learning, so scene generation is written with code.
+See `main.cpp` for the code that generated these scenes below:
+
+
+### Select Renders:
+
+<img src="renders/finalrender.png">
+<img src="renders/cones.png">
