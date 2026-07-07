@@ -12,6 +12,7 @@ book.
 - Spheres, Planes, Cones
 - Unions & Intersections
 - Depth of Field
+- Parallelism with OpenMP
 
 ### Usage Guide:
 
